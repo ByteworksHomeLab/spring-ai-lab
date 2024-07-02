@@ -11,7 +11,7 @@ video ["A Tiny Taste of Spring AI with Ollama"](https://www.linkedin.com/video/l
 
 Ollama is not an LLM, it is plaform on which you can run LLMs. Visit the [Ollama models page](https://ollama.com/library) for the list of supported models, ranked by popularity. 
 
-![ollama-models.png](..%2F..%2F..%2FDesktop%2Follama-models.png)
+![ollama-models.png](src/main/resources/static/ollama-models.png)
 
 For this example, we will use [Meta llama 3](https://llama.meta.com/llama3/) and [Mistral 7B](https://mistral.ai/technology/#models).
 
@@ -58,10 +58,8 @@ sdk install java 22.0.1-tem
 sdk use java 22.0.1-tem
 ```
 
-
-
 ### Spring AI Project
 
 Use [Spring Initializr](https://start.spring.io) to create a project with the dependencies shown below:
 
-![start.spring-io.jpeg](..%2F..%2F..%2FDesktop%2Fstart.spring-io.jpeg)
+![start.spring-io.jpeg](src/main/resources/static/start.spring-io.jpeg)
