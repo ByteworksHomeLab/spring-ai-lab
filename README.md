@@ -1,6 +1,6 @@
 # Spring AI Lab
-The project is based on work by [DaShaun Carter](linkedin.com/in/dashaun) See the DaShaun's
-video ["A Tiny Taste of Spring AI with Ollama"](https://www.linkedin.com/video/live/urn:li:ugcPost:7213736555662753792/). Also see [Dan Vega's AI Workshop](https://github.com/danvega/spring-ai-workshop).
+The project is based on work by [DaShaun Carter](linkedin.com/in/dashaun). See the DaShaun's
+video ["A Tiny Taste of Spring AI with Ollama."](https://www.linkedin.com/video/live/urn:li:ugcPost:7213736555662753792/) Also see [Dan Vega's AI Workshop](https://github.com/danvega/spring-ai-workshop).
 
 ## Getting Started
 The purpose of this project is to dip your toes into the AI waters, and you'll need realistic expectations about performance. 
@@ -54,6 +54,8 @@ pulling d0eeef8264ce...  61% ▕████████████████
 Error: write /root/.ollama/models/blobs/sha256-d0eeef8264ce10a7e578789ee69986c66425639e72c9855e36a0345c230918c9-partial: no space left on device
 ```
 
+One last check before moving on to Spring AI, you can confirm that the Ollama API is ready by navigating to the [Ollama API URL](http://localhost:11434) in a web browser. It returns the text "Ollama is running."
+
 ## Spring AI
 Next, set up a Spring AI project, starting with Java, Maven and an IDE.
 
@@ -69,3 +71,5 @@ sdk use java 22.0.1-tem
 Use [Spring Initializr](https://start.spring.io) to create a project with the dependencies shown below:
 
 ![start.spring-io.jpeg](src/main/resources/static/start.spring-io.jpeg)
+
+
