@@ -1,31 +1,25 @@
 # Spring AI Lab
-
 The project is based on work by [DaShaun Carter](linkedin.com/in/dashaun) See the DaShaun's
 video ["A Tiny Taste of Spring AI with Ollama"](https://www.linkedin.com/video/live/urn:li:ugcPost:7213736555662753792/). Also see [Dan Vega's AI Workshop](https://github.com/danvega/spring-ai-workshop).
 
 ## Getting Started
-
-
 The purpose of this project is to dip your toes into the AI waters, and you'll need realistic expectations about performance. 
 
 ### What about GPUs?
+The good news is that you can do this lab without a GPU as long as you have patience. 
 
-The good news is that you do this lab without a GPU as long as you have patience. 
-
-[Meta's Lama 3 Requirements](https://llamaimodel.com/requirements/) say you can get by with an NVidia GeForce RTX 3000 series GPU, which as about 12 GB RAM. NLP Cloud's article [How to Install and Deploy LLaMA 3 Into Production?](https://nlpcloud.com/how-to-install-and-deploy-llama-3-into-production.html) recommends 20 GB RAM on the GPU, like an NVidia A10, for production use.
-
+[Meta's Lama 3 Requirements](https://llamaimodel.com/requirements/) say you can get by with an NVidia GeForce RTX 3000 series GPU, which has about 12 GB RAM. NLP Cloud's article [How to Install and Deploy LLaMA 3 Into Production?](https://nlpcloud.com/how-to-install-and-deploy-llama-3-into-production.html) recommends 20 GB RAM on the GPU, like an NVidia A10, for production use.
 
 ### Ollama LLM Platform
+For this lab we are running LLMs on a Docker image of [Ollama](https://ollama.com/). Ollama is not meant to be used in production. 
 
-For this lab we are running LLMs on a Docker image of [Ollama](https://ollama.com/).
-
-Ollama is an open source platform for running LLMs (Large Language Models) locally. It makes it easier to get started with AI by hidiong the complexities of running an LLM.  Choose the best runtime option for your situation. You can download the [Ollama Docker image](https://hub.docker.com/r/ollama/ollama), or you can [download the binary to your operating system](https://ollama.com/download/).
+Ollama is an open source platform for running LLMs (Large Language Models) locally. It makes it easier to get started with AI by hiding the complexities of running an LLM.  Choose the best runtime option for your situation. You can download the [Ollama Docker image](https://hub.docker.com/r/ollama/ollama), or you can [download the binary to your operating system](https://ollama.com/download/).
 
 Ollama supports many different LLMs. Visit the [Ollama models page](https://ollama.com/library) for the list of supported LLMs, ranked by popularity. 
 
 ![ollama-models.png](src/main/resources/static/ollama-models.png)
 
-For this example, we will use [Meta llama 3](https://llama.meta.com/llama3/).
+For this example, we will use [Meta's llama 3](https://llama.meta.com/llama3/).
 
 Run these commands to get started.
 
@@ -50,8 +44,6 @@ Because it was two-tired!
 Hope that made you smile! Do you want to hear another?
 
 >>>/bye
-It was nice sharing a joke with you. If you ever want to hear another or chat about something else, feel free to
-come back and I'll be here! Otherwise, it's been a pleasure, and I bid you adieu!
 ```
 You can install more than one LLM on Ollama, but I filled up my Docker volume when I tried.
 
@@ -63,11 +55,9 @@ Error: write /root/.ollama/models/blobs/sha256-d0eeef8264ce10a7e578789ee69986c66
 ```
 
 ## Spring AI
-
 Next, set up a Spring AI project, starting with Java, Maven and an IDE.
 
 ### Java JVM
-
 Grab the latest version of Java. [SDK Man](https://sdkman.io/) is the easiest way to switch around SDK versions.
 
 ```Shell
@@ -76,7 +66,6 @@ sdk use java 22.0.1-tem
 ```
 
 ### Spring AI Library
-
 Use [Spring Initializr](https://start.spring.io) to create a project with the dependencies shown below:
 
 ![start.spring-io.jpeg](src/main/resources/static/start.spring-io.jpeg)
