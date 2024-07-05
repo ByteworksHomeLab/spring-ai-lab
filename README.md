@@ -1,6 +1,19 @@
 # Spring AI Lab
 The project is based on work by [DaShaun Carter](linkedin.com/in/dashaun). See the DaShaun's
-video ["A Tiny Taste of Spring AI with Ollama."](https://www.linkedin.com/video/live/urn:li:ugcPost:7213736555662753792/) Also see [Dan Vega's AI Workshop](https://github.com/danvega/spring-ai-workshop).
+video ["A Tiny Taste of Spring AI with Ollama."](https://www.linkedin.com/video/live/urn:li:ugcPost:7213736555662753792/) Also see Dan Vega's AI Workshop in [GitHub](https://github.com/danvega/spring-ai-workshop) or on [YouTube](https://www.youtube.com/watch?v=x6KmUyPWy2Q)
+
+# Audience
+
+The audience or this Spring Framework application developers new to artificial intelligence.
+
+# Use Cases
+
+Your employer asks you to:
+- Improve Customer Service by combining augmenting the company Knowledge base with AI.
+- Speed up the sales process by combining AI with a database of previously written Statements of work.
+- Improve coding efficency and consistency by leveraging existing company code repositories and AI.
+- Host a private LLM so employees can use take advantage of AI privately, without transmitting sensitive company or client data over the public internet.
+- Provide HR self-service utilizing AI and company HR policy documents.
 
 ## Getting Started
 The purpose of this project is to dip your toes into the AI waters, and you'll need realistic expectations about performance. 
