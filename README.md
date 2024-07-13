@@ -2,6 +2,20 @@
 The project is based on work by [DaShaun Carter](linkedin.com/in/dashaun). See the DaShaun's
 video ["A Tiny Taste of Spring AI with Ollama."](https://www.linkedin.com/video/live/urn:li:ugcPost:7213736555662753792/) Also see Dan Vega's AI Workshop in [GitHub](https://github.com/danvega/spring-ai-workshop) or on [YouTube](https://www.youtube.com/watch?v=x6KmUyPWy2Q)
 
+There are two LLMs support, Ollama Platform and Mistral, controlled with Spring profiles. Run one of these two commands:
+
+```shell
+mvn spring-boot:run -Dspring-boot.run.profiles=ollama
+```
+
+---OR---
+
+```shell
+export SPRING_AI_OPENAI_API_KEY=MY_SECRET_API_KEY
+mvn spring-boot:run -Dspring-boot.run.profiles=mistral
+```
+
+
 # Audience
 
 The audience or this Spring Framework application developers new to artificial intelligence.
@@ -13,7 +27,8 @@ Your employer asks you to:
 - Speed up the sales process by combining AI with a database of previously written Statements of work.
 - Improve coding efficency and consistency by leveraging existing company code repositories and AI.
 - Host a private LLM so employees can use take advantage of AI privately, without transmitting sensitive company or client data over the public internet.
-- Provide HR self-service utilizing AI and company HR policy documents.
+
+You probably see a trend here. As a Spring Developer, you may be asked to add AI to your Spring application that augments an open source large language model with proprietary company data. These are the situations where Spring AI can help.
 
 ## Getting Started
 The purpose of this project is to dip your toes into the AI waters, and you'll need realistic expectations about performance. 

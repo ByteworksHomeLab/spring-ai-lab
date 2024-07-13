@@ -1,10 +1,4 @@
 spring:
-  ai:
-    ollama:
-      base-url: http://localhost:11434
-      chat:
-        options:
-          model: llama3
   application:
     name: spring-ai
 management:
@@ -12,3 +6,25 @@ management:
     web:
       exposure:
         include: "*"
+---
+spring:
+  config:
+    activate:
+      on-profile: "ollama"
+  ai:
+    ollama:
+      base-url: http://10.0.0.7:11434
+      chat:
+        options:
+          model: llama3
+---
+spring:
+  config:
+    activate:
+      on-profile: "mistral"
+  ai:
+    ollama:
+      base-url: http://10.0.0.7:11434
+      chat:
+        options:
+          model: mistral
