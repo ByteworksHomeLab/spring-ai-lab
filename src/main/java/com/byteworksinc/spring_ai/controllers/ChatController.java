@@ -3,7 +3,7 @@ package com.byteworksinc.spring_ai.controllers;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +36,7 @@ public class ChatController {
      * @return
      */
     @GetMapping("/jokes-by-topic")
-    public String jokesByTopic(@RequestParam String topic) {
+    public String jokesByTopic(@RequestParam(value = "topic", defaultValue = "animals") String topic) {
         return chatClient.prompt()
                 .user(u -> u.text("Tell me a joke about {topic}").param("topic",topic))
                 .call()
