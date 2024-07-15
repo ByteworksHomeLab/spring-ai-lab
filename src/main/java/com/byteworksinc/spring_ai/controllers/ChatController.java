@@ -2,11 +2,18 @@ package com.byteworksinc.spring_ai.controllers;
 
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ChatController {
@@ -52,6 +59,30 @@ public class ChatController {
     public ChatResponse jokeWithResponse(@RequestParam(value = "message", defaultValue = "Tell me a dad joke about computers") String message) {
         return chatClient.prompt()
                 .user(message)
+                .call()
+                .chatResponse();
+    }
+
+    @GetMapping("jokes-by-pete")
+    public ChatResponse jokesByPete(
+            @RequestParam(value = "name", defaultValue = "friend") String name,
+            @RequestParam(value = "adjective", defaultValue = "dad") String adjective,
+            @RequestParam(value = "topic", defaultValue = "animals") String topic
+    ) {
+        String userText = "My name is {name}. Tell me a {adjective}  joke about {topic}.";
+        PromptTemplate userPromptTemplate = new PromptTemplate(userText);
+        Message userMessage = userPromptTemplate.createMessage(Map.of("name", name, "adjective", adjective, "topic", topic));
+        String systemText = """
+                               You're a comedian named {name}.
+                               First, greet the user by name, introduce yourself, then reply to the user's request.
+                               Finish by thanking the user for asking for a joke.
+                             """;
+        SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(systemText);
+        Message systemMessage = systemPromptTemplate.createMessage(Map.of("name", "Alexa"));
+        System.out.println(systemMessage.getContent());
+        return chatClient.prompt()
+                .user(userMessage.getContent())
+                .system(systemMessage.getContent())
                 .call()
                 .chatResponse();
     }

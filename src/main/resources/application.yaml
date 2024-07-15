@@ -28,3 +28,11 @@ spring:
       chat:
         options:
           model: mistral
+---
+spring:
+  config:
+    activate:
+      on-profile: "openai"
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}

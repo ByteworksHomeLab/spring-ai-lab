@@ -5,14 +5,17 @@ video ["A Tiny Taste of Spring AI with Ollama."](https://www.linkedin.com/video/
 There are two LLMs support, Ollama Platform and Mistral, controlled with Spring profiles. Run one of these two commands:
 
 ```shell
-mvn spring-boot:run -Dspring-boot.run.profiles=ollama
+mvn spring-boot:run -Dspring-boot.run.profiles=llama3
 ```
-
+---OR---
+```shell
+mvn spring-boot:run -Dspring-boot.run.profiles=mistral
+```
 ---OR---
 
 ```shell
-export SPRING_AI_OPENAI_API_KEY=MY_SECRET_API_KEY
-mvn spring-boot:run -Dspring-boot.run.profiles=mistral
+export OPENAI_API_KEY=put-your-personal-openai-api-key-here
+mvn spring-boot:run -Dspring-boot.run.profiles=openai
 ```
 
 
