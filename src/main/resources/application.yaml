@@ -1,6 +1,18 @@
 spring:
   application:
     name: spring-ai
+  datasource:
+    url: jdbc:postgresql://localhost:5432/airbnb
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 management:
   endpoints:
     web:
@@ -10,24 +22,13 @@ management:
 spring:
   config:
     activate:
-      on-profile: "ollama"
+      on-profile: "llama3"
   ai:
     ollama:
       base-url: http://10.0.0.7:11434
       chat:
         options:
           model: llama3
----
-spring:
-  config:
-    activate:
-      on-profile: "mistral"
-  ai:
-    ollama:
-      base-url: http://10.0.0.7:11434
-      chat:
-        options:
-          model: mistral
 ---
 spring:
   config:

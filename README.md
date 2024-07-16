@@ -2,14 +2,17 @@
 The project is based on work by [DaShaun Carter](linkedin.com/in/dashaun). See the DaShaun's
 video ["A Tiny Taste of Spring AI with Ollama."](https://www.linkedin.com/video/live/urn:li:ugcPost:7213736555662753792/) Also see Dan Vega's AI Workshop in [GitHub](https://github.com/danvega/spring-ai-workshop) or on [YouTube](https://www.youtube.com/watch?v=x6KmUyPWy2Q)
 
-There are two LLMs support, Ollama Platform and Mistral, controlled with Spring profiles. Run one of these two commands:
+This project configures two LLMs, Llama3 on the Ollama Platform and OpenAI, controlled with Spring profiles. Run one of these two commands:
+
+You need to export three environment variables in your terminal:
+
+```shell
+export DB_USER=Your postgres user
+export DB_PASSWORD=your postgres password
+```
 
 ```shell
 mvn spring-boot:run -Dspring-boot.run.profiles=llama3
-```
----OR---
-```shell
-mvn spring-boot:run -Dspring-boot.run.profiles=mistral
 ```
 ---OR---
 
