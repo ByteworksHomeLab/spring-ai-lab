@@ -1,7 +1,8 @@
-package com.byteworksinc.spring_ai;
+package com.byteworksinc.airbnb;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 class SpringAiApplicationTests {

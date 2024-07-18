@@ -1,6 +1,9 @@
 spring:
   application:
     name: spring-ai
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
   datasource:
     url: jdbc:postgresql://localhost:5432/airbnb
     username: ${DB_USER}
@@ -9,10 +12,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+    database: postgresql
 management:
   endpoints:
     web:
@@ -33,7 +37,10 @@ spring:
 spring:
   config:
     activate:
-      on-profile: "openai"
+      on-profile: "gpt-4o"
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o
+airbnbLoadListings: true

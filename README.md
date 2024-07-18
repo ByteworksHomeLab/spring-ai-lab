@@ -12,13 +12,13 @@ export DB_PASSWORD=your postgres password
 ```
 
 ```shell
-mvn spring-boot:run -Dspring-boot.run.profiles=llama3
+mvn -Pollama spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=llama3"
 ```
 ---OR---
 
 ```shell
 export OPENAI_API_KEY=put-your-personal-openai-api-key-here
-mvn spring-boot:run -Dspring-boot.run.profiles=openai
+mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=gpt-4o"
 ```
 
 
