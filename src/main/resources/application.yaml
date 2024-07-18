@@ -4,6 +4,11 @@ spring:
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
+    vectorstore:
+      pgvector:
+      index-type: HNSW
+      distance-type: COSINE_DISTANCE
+      dimensions: 1536
   datasource:
     url: jdbc:postgresql://localhost:5432/airbnb
     username: ${DB_USER}
