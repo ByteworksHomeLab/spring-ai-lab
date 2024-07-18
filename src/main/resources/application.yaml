@@ -4,11 +4,6 @@ spring:
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
-    vectorstore:
-      pgvector:
-      index-type: HNSW
-      distance-type: COSINE_DISTANCE
-      dimensions: 1536
   datasource:
     url: jdbc:postgresql://localhost:5432/airbnb
     username: ${DB_USER}
@@ -48,4 +43,16 @@ spring:
       chat:
         options:
           model: gpt-4o
+---
+spring:
+  config:
+    activate:
+      on-profile: "postgres"
+  ai:
+    vectorstore:
+      pgvector:
+      index-type: HNSW
+      distance-type: COSINE_DISTANCE
+      dimensions: 1536
+
 airbnbLoadListings: true
