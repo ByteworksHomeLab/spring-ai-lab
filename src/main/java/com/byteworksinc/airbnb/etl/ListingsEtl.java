@@ -1,28 +1,30 @@
 package com.byteworksinc.airbnb.etl;
 
+import com.byteworksinc.airbnb.dao.ListingDao;
 import com.byteworksinc.airbnb.entities.Listing;
-import com.byteworksinc.airbnb.repositories.ListingRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 @Slf4j
 @Component
 public class ListingsEtl {
-    private final ListingRepository listingRepository;
+    private final ListingDao listingDao;
 
     private final String[] headers = {"id", "listing_url", "scrape_id", "last_scraped", "source", "name", "description",
             "neighborhood_overview", "picture_url", "host_id", "host_url", "host_name", "host_since", "host_location",
@@ -39,10 +41,10 @@ public class ListingsEtl {
             "instant_bookable", "calculated_host_listings_count", "calculated_host_listings_count_entire_homes",
             "calculated_host_listings_count_private_rooms", "calculated_host_listings_count_shared_rooms", "reviews_per_month" };
 
-    public ListingsEtl(final ListingRepository listingRepository, @Value("${airbnbLoadListings:false}") final boolean loadListings) {
-        this.listingRepository = listingRepository;
+    public ListingsEtl(final ListingDao listingDao, @Value("${airbnbLoadListings:false}") final boolean loadListings) {
+        this.listingDao = listingDao;
         if (loadListings) {
-            listingRepository.deleteAll();
+            listingDao.deleteAll();
             readListingCsvFile("data/listings.csv");
         }
         log.info(String.format("loadListings is %s", loadListings));
@@ -68,9 +70,6 @@ public class ListingsEtl {
 
     private void readListingInputStream(InputStream input) throws Exception {
         int count = 0;
-        int total = 0;
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<Listing> listings = new ArrayList<>();
         Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8);
         Iterable<CSVRecord> records = CSVFormat.DEFAULT
                 .withHeader(headers)
@@ -78,10 +77,10 @@ public class ListingsEtl {
                 .parse(reader);
         for (CSVRecord record : records) {
             count += 1;
-            total += 1;
             Listing listing = new Listing();
             listing.setId(Long.parseLong(record.get("id")));
             listing.setScrapeId(getLong(record, "scrape_id"));
+            listing.setLastScraped(convertDate(record.get("last_scraped")));
             listing.setSource(record.get("source"));
             listing.setName(record.get("name"));
             listing.setDescription(record.get("description"));
@@ -90,13 +89,13 @@ public class ListingsEtl {
             listing.setHostId(Long.parseLong(record.get("host_id")));
             listing.setHostUrl(record.get("host_url"));
             listing.setHostName(record.get("host_name"));
-//                listing.setHostSince(record.get("host_since"));
+            listing.setHostSince(convertDate(record.get("host_since")));
             listing.setHostLocation(record.get("host_location"));
             listing.setHostAbout(record.get("host_about"));
             listing.setHostResponseTime(record.get("host_response_time"));
             listing.setHostResponseRate(record.get("host_response_rate"));
             listing.setHostAcceptanceRate(record.get("host_acceptance_rate"));
-            listing.setHostIsSuperHost(Boolean.parseBoolean(record.get("host_is_superhost")));
+            listing.setHostIsSuperhost(Boolean.parseBoolean(record.get("host_is_superhost")));
             listing.setHostThumbnailUrl(record.get("host_thumbnail_url"));
             listing.setHostPictureUrl(record.get("host_picture_url"));
             listing.setHostNeighbourhood(record.get("host_neighbourhood"));
@@ -107,8 +106,8 @@ public class ListingsEtl {
             listing.setHostIdentityVerified(Boolean.parseBoolean(record.get("host_identity_verified")));
             listing.setNeighbourhood(record.get("neighbourhood"));
             listing.setNeighbourhoodCleansed(Boolean.parseBoolean(record.get("neighbourhood_group_cleansed")));
-            listing.setLatitude(getBigDecimal(record, "latitude"));
-            listing.setLongitude(getBigDecimal(record, "longitude"));
+            listing.setLatitude(getBigDecimal(record, "latitude").setScale(5, RoundingMode.HALF_UP));
+            listing.setLongitude(getBigDecimal(record, "longitude").setScale(5, RoundingMode.HALF_UP));
             listing.setPropertyType(record.get("property_type"));
             listing.setRoomType(record.get("room_type"));
             listing.setAccommodates(getInteger(record, "accommodates"));
@@ -128,12 +127,12 @@ public class ListingsEtl {
             listing.setAvailability30(getInteger(record, "availability_30"));
             listing.setAvailability60(getInteger(record, "availability_60"));
             listing.setAvailability365(getInteger(record, "availability_365"));
-//                listing.setCalendarLastScraped(getInteger(record, "calendar_last_scraped"));
+            listing.setCalendarLastScraped(convertDate(record.get("calendar_last_scraped")));
             listing.setNumberOfReviews(getInteger(record, "number_of_reviews"));
             listing.setNumberOfReviewsLtm(getInteger(record, "number_of_reviews_ltm"));
             listing.setNumberOfReviewsL30d(getInteger(record, "number_of_reviews_l30d"));
-//                listing.setFirstReview(record.get("first_review"));
-//                listing.setFirstReview(record.get("last_review"));
+            listing.setFirstReview(convertDate(record.get("first_review")));
+            listing.setLastReview(convertDate(record.get("last_review")));
             listing.setReviewScoresRating(getFloat(record, "review_scores_rating"));
             listing.setReviewScoresAccuracy(getFloat(record, "review_scores_accuracy"));
             listing.setReviewScoresAccuracy(getFloat(record, "review_scores_accuracy"));
@@ -149,21 +148,12 @@ public class ListingsEtl {
             listing.setCalculatedHostListingsCountPrivateRooms(getInteger(record, "calculated_host_listings_count_private_rooms"));
             listing.setCalculatedHostListingsCountSharedRooms(getInteger(record, "calculated_host_listings_count_shared_rooms"));
             listing.setReviewsPerMonth(getFloat(record, "reviews_per_month"));
-            listings.add(listing);
-
-            if (count % 100 == 0) {
-                log.info(String.format("Writing listing %s", total));
+            if (count % 500 == 0) {
+                log.info(String.format("Saving listing %s.", count));
             }
-            if (count > 500) {
-                listingRepository.saveAllAndFlush(listings);
-                listings.clear();
-                count = 0;
-            }
+            listingDao.save(listing);
         }
-        if (!listings.isEmpty()) {
-            listingRepository.saveAllAndFlush(listings);
-        }
-        log.info(String.format("Wrote %s listings.", total));
+        log.info(String.format("Wrote %s listings.", count));
     }
 
     public Integer getInteger(CSVRecord record, String columnName) {
@@ -217,5 +207,18 @@ public class ListingsEtl {
             }
         }
         return null;
+    }
+
+    public Date convertDate(String value) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        Date date = null;
+        if (value != null && !value.isEmpty()) {
+            try {
+                date = formatter.parse(value);
+            } catch (ParseException e) {
+                log.warn(String.format("Could not parse date %s", value));
+            }
+        }
+        return date;
     }
 }

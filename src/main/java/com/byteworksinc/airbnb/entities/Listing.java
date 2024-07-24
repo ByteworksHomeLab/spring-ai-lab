@@ -1,51 +1,38 @@
 package com.byteworksinc.airbnb.entities;
 
-import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Data
-@Entity
 @ToString
 @NoArgsConstructor
-@Table(name = "listing", schema = "public", indexes = {
-        @Index(name = "IDXAirbnb_02", columnList = "hostId"),
-        @Index(name = "IDXAirbnb_03", columnList = "propertyType"),
-        @Index(name = "IDXAirbnb_04", columnList = "roomType"),
-        @Index(name = "IDXAirbnb_05", columnList = "bedrooms")
-})
 public class Listing implements Serializable {
-    @Id
-    private Long id;
+    private long id;
     private String listingUrl;
-    private Long scrapeId;
+    private long scrapeId;
     private String source;
     private Date lastSearched;
     private Date lastScraped;
     private String name;
-    @Column(columnDefinition = "TEXT")
     private String description;
-    @Column(columnDefinition = "TEXT")
+    private String description_vector;
     private String neighborhoodOverview;
     private String pictureUrl;
-    private Long hostId;
+    private long hostId;
     private String hostUrl;
     private String hostName;
     private Date hostSince;
     private String hostLocation;
-    @Column(columnDefinition = "TEXT")
     private String hostAbout;
     private String hostResponseTime;
     private String hostResponseRate;
     private String hostAcceptanceRate;
-    private boolean hostIsSuperHost;
+    private boolean hostIsSuperhost;
     private String hostThumbnailUrl;
     private String hostPictureUrl;
     private String hostNeighbourhood;
@@ -100,11 +87,12 @@ public class Listing implements Serializable {
     private Integer calculatedHostListingsCountEntireHomes;
     private Integer calculatedHostListingsCountPrivateRooms;
     private Integer calculatedHostListingsCountSharedRooms;
-    private Integer regionId;
+    private Long regionId;
     private String regionName;
-    private Integer regionParentId;
+    private Long regionParentId;
     private String regionParentName;
-    private Integer regionParentParentId;
+    private Long regionParentParentId;
     private String regionParentParentName;
     private Float reviewsPerMonth;
+    private String titleSearchVector;
 }

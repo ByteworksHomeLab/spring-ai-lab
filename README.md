@@ -9,6 +9,7 @@ You need to export three environment variables in your terminal:
 ```shell
 export DB_USER=Your postgres user
 export DB_PASSWORD=your postgres password
+export OPENAI_API_KEY=put-your-personal-openai-api-key-here
 ```
 
 ```shell
@@ -17,7 +18,7 @@ mvn -Pollama -Ppgvector spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring
 ---OR---
 
 ```shell
-export OPENAI_API_KEY=put-your-personal-openai-api-key-here
+
 mvn -Popenai -Ppgvector spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=gpt-4o,postgres"
 ```
 
