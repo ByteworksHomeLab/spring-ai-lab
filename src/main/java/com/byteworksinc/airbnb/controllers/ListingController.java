@@ -3,6 +3,7 @@ package com.byteworksinc.airbnb.controllers;
 import com.byteworksinc.airbnb.dao.ListingDao;
 import com.byteworksinc.airbnb.entities.Listing;
 import org.springframework.stereotype.Controller;
+
 @Controller
 public class ListingController {
 

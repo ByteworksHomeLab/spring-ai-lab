@@ -39,15 +39,16 @@ public class ListingsEtl {
             "first_review", "last_review", "review_scores_rating", "review_scores_accuracy", "review_scores_cleanliness",
             "review_scores_checkin", "review_scores_communication", "review_scores_location", "review_scores_value", "license",
             "instant_bookable", "calculated_host_listings_count", "calculated_host_listings_count_entire_homes",
-            "calculated_host_listings_count_private_rooms", "calculated_host_listings_count_shared_rooms", "reviews_per_month" };
+            "calculated_host_listings_count_private_rooms", "calculated_host_listings_count_shared_rooms", "reviews_per_month"};
 
     public ListingsEtl(final ListingDao listingDao, @Value("${airbnbLoadListings:false}") final boolean loadListings) {
         this.listingDao = listingDao;
+        log.info(String.format("airbnbLoadListings is set to %s", loadListings));
         if (loadListings) {
             listingDao.deleteAll();
             readListingCsvFile("data/listings.csv");
         }
-        log.info(String.format("loadListings is %s", loadListings));
+
     }
 
     public void readListingCsvFile(final String path) {

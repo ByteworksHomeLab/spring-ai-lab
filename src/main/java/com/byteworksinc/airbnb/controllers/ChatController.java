@@ -23,6 +23,7 @@ public class ChatController {
 
     /**
      * A basic example of how to use the chat client to pass a message and call the LLM
+     *
      * @param message
      * @return
      */
@@ -36,19 +37,21 @@ public class ChatController {
 
     /**
      * Take in a topic as a request parameter and use that param in the user message
+     *
      * @param topic
      * @return
      */
     @GetMapping("/jokes-by-topic")
     public String jokesByTopic(@RequestParam(value = "topic", defaultValue = "animals") String topic) {
         return chatClient.prompt()
-                .user(u -> u.text("Tell me a joke about {topic}").param("topic",topic))
+                .user(u -> u.text("Tell me a joke about {topic}").param("topic", topic))
                 .call()
                 .content();
     }
 
     /**
      * What if you didn't want to get a String back, and you wanted the whole response?
+     *
      * @param message
      * @return
      */
@@ -70,10 +73,10 @@ public class ChatController {
         PromptTemplate userPromptTemplate = new PromptTemplate(userText);
         Message userMessage = userPromptTemplate.createMessage(Map.of("name", name, "adjective", adjective, "topic", topic));
         String systemText = """
-                               You're a comedian named {name}.
-                               First, greet the user by name, introduce yourself, then reply to the user's request.
-                               Finish by thanking the user for asking for a joke.
-                             """;
+                  You're a comedian named {name}.
+                  First, greet the user by name, introduce yourself, then reply to the user's request.
+                  Finish by thanking the user for asking for a joke.
+                """;
         SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(systemText);
         Message systemMessage = systemPromptTemplate.createMessage(Map.of("name", "Alexa"));
         System.out.println(systemMessage.getContent());

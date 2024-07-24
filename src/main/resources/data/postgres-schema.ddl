@@ -1,4 +1,4 @@
-create table listing
+CREATE TABLE listing
 (
     id                                           BIGINT        NOT NULL,
     listing_url                                  TEXT,
@@ -10,7 +10,7 @@ create table listing
     description                                  TEXT,
     neighborhood_overview                        TEXT,
     picture_url                                  TEXT,
-    host_id                                      BIGINT       NOT NULL,
+    host_id                                      BIGINT        NOT NULL,
     host_url                                     TEXT          NOT NULL,
     host_name                                    TEXT          NOT NULL,
     host_since                                   TIMESTAMP without time zone,
@@ -83,15 +83,15 @@ create table listing
     CONSTRAINT "PKListing_01" PRIMARY KEY ("id")
 );
 
-create index "IDXAirbnb_02"
+CREATE INDEX "IDXAirbnb_02"
     on listing (host_id);
 
-create index "IDXAirbnb_03"
+CREATE INDEX "IDXAirbnb_03"
     on listing (property_type);
 
-create index "IDXAirbnb_04"
+CREATE INDEX "IDXAirbnb_04"
     on listing (room_type);
 
-create index "IDXAirbnb_05"
+CREATE INDEX "IDXAirbnb_05"
     on listing (bedrooms);
 

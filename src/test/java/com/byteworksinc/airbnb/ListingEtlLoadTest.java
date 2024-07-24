@@ -1,15 +1,15 @@
 package com.byteworksinc.airbnb;
 
+import com.byteworksinc.airbnb.dao.ListingDao;
 import com.byteworksinc.airbnb.entities.Listing;
 import com.byteworksinc.airbnb.etl.ListingsEtl;
-import com.byteworksinc.airbnb.dao.ListingDao;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
