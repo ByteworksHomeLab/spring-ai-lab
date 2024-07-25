@@ -20,4 +20,8 @@ public class ListingController {
     public Listing findById(long id) {
         return listingDao.findById(id);
     }
+
+    public void deleteListing(long id) {
+        listingDao.deleteListing(id);
+    }
 }

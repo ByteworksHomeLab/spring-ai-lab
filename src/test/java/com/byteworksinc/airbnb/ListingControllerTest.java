@@ -1,12 +1,15 @@
 package com.byteworksinc.airbnb;
 
 import com.byteworksinc.airbnb.controllers.ListingController;
+import com.byteworksinc.airbnb.dao.ListingDao;
 import com.byteworksinc.airbnb.entities.Listing;
 import com.byteworksinc.airbnb.etl.ListingsEtl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -15,7 +18,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
+@Rollback(true)
 public class ListingControllerTest {
+
+    @Autowired
+    private ListingDao listingDao;
 
     @Autowired
     private ListingController listingController;
@@ -24,8 +31,10 @@ public class ListingControllerTest {
     private ListingsEtl listingsEtl;
 
     @Test
+    @Rollback(true)
     @Sql({"/test-schema.ddl"})
     public void testInsertListing() {
+        listingDao.deleteAll();
         Listing listing = new Listing();
         listing.setId(1234567L);
         listing.setListingUrl("https://www.airbnb.com/rooms/5456");
@@ -101,6 +110,7 @@ public class ListingControllerTest {
         assertNotNull(result, "Expected a listing but found none.");
         assertNotNull(listingController.findById(result.getId()), "Expected to find Listing by ID. but found none.");
         assertEquals(20240617171903L, listing.getScrapeId());
+
     }
 
 }

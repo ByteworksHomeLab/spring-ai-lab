@@ -11,5 +11,7 @@ public interface ListingDao {
 
     Listing findById(Long id);
 
+    void deleteListing(Long id);
+
     void deleteAll();
 }

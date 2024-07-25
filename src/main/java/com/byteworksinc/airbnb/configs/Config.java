@@ -7,7 +7,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
-@PropertySource("classpath:application.yaml")
+@PropertySource("classpath:application.yml")
 class Config {
     @Bean
     ChatClient chatClient(ChatClient.Builder builder) {

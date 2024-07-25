@@ -1,10 +1,11 @@
-CREATE TABLE listing
+CREATE EXTENSION IF NOT EXISTS vector;
+CREATE TABLE IF NOT EXISTS listing
 (
     id                                           BIGINT        NOT NULL,
     listing_url                                  TEXT,
     scrape_id                                    BIGINT        NOT NULL,
-    last_searched                                TIMESTAMP without time zone,
-    last_scraped                                 TIMESTAMP without time zone,
+    last_searched                                TIMESTAMP WITHOUT TIME ZONE,
+    last_scraped                                 TIMESTAMP WITHOUT TIME ZONE,
     source                                       TEXT,
     name                                         TEXT,
     description                                  TEXT,
@@ -13,7 +14,7 @@ CREATE TABLE listing
     host_id                                      BIGINT        NOT NULL,
     host_url                                     TEXT          NOT NULL,
     host_name                                    TEXT          NOT NULL,
-    host_since                                   TIMESTAMP without time zone,
+    host_since                                   TIMESTAMP WITHOUT TIME ZONE,
     host_location                                TEXT,
     host_about                                   TEXT,
     host_response_time                           varchar(18)   NOT NULL,
@@ -53,12 +54,12 @@ CREATE TABLE listing
     availability_60                              INTEGER,
     availability_90                              INTEGER,
     availability_365                             INTEGER,
-    calendar_last_scraped                        TIMESTAMP without time zone,
+    calendar_last_scraped                        TIMESTAMP WITHOUT TIME ZONE,
     number_of_reviews                            INTEGER       NOT NULL,
     number_of_reviews_ltm                        INTEGER       NOT NULL,
     number_of_reviews_l30d                       INTEGER,
-    first_review                                 TIMESTAMP without time zone,
-    last_review                                  TIMESTAMP without time zone,
+    first_review                                 TIMESTAMP WITHOUT TIME ZONE,
+    last_review                                  TIMESTAMP WITHOUT TIME ZONE,
     review_scores_rating                         INTEGER,
     review_scores_accuracy                       INTEGER,
     review_scores_cleanliness                    INTEGER,
@@ -83,15 +84,15 @@ CREATE TABLE listing
     CONSTRAINT "PKListing_01" PRIMARY KEY ("id")
 );
 
-CREATE INDEX "IDXAirbnb_02"
+CREATE INDEX  IF NOT EXISTS "IDXAirbnb_02"
     on listing (host_id);
 
-CREATE INDEX "IDXAirbnb_03"
+CREATE INDEX IF NOT EXISTS "IDXAirbnb_03"
     on listing (property_type);
 
-CREATE INDEX "IDXAirbnb_04"
+CREATE INDEX IF NOT EXISTS "IDXAirbnb_04"
     on listing (room_type);
 
-CREATE INDEX "IDXAirbnb_05"
+CREATE INDEX IF NOT EXISTS "IDXAirbnb_05"
     on listing (bedrooms);
 

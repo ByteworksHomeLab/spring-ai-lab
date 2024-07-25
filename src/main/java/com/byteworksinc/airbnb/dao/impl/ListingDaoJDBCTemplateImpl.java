@@ -67,6 +67,13 @@ public class ListingDaoJDBCTemplateImpl implements ListingDao {
     }
 
     @Override
+    public void deleteListing(Long id) {
+        String query = "DELETE FROM listing WHERE id = ?";
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        jdbcTemplate.update(query, id);
+    }
+
+    @Override
     @Transactional
     public void deleteAll() {
         Connection con = null;
