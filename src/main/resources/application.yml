@@ -4,8 +4,6 @@ spring:
   application:
     name: spring-ai-airbnb
   ai:
-    openai:
-      api-key: ${OPENAI_API_KEY}
     vectorstore:
       pgvector:
       index-type: HNSW
@@ -28,10 +26,10 @@ spring:
       on-profile: "llama3"
   ai:
     ollama:
-      base-url: http://10.0.0.7:11434
+      base-url: http://localhost:11434
       chat:
-        options:
-          model: llama3
+        model: llama3
+      embedding.model: llama3
 ---
 spring:
   config:
@@ -39,8 +37,8 @@ spring:
       on-profile: "gpt-4o"
   ai:
     openai:
+      api-key: ${OPENAI_API_KEY}
       chat:
         options:
           model: gpt-4o
-
 airbnbLoadListings: false
