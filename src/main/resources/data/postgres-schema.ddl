@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS listing
     host_has_profile_pic                         BOOLEAN       NOT NULL,
     host_identity_verified                       BOOLEAN       NOT NULL,
     neighbourhood                                TEXT          NOT NULL,
+    neighbourhood_cleansed                       BOOLEAN,
+    neighbourhood_group_cleansed                 BOOLEAN,
     latitude                                     NUMERIC(7, 5) NOT NULL,
     longitude                                    NUMERIC(7, 5) NOT NULL,
     property_type                                TEXT,

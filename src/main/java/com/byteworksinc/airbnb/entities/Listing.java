@@ -1,98 +1,33 @@
 package com.byteworksinc.airbnb.entities;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Data
-@ToString
-@NoArgsConstructor
-public class Listing implements Serializable {
-    private long id;
-    private String listingUrl;
-    private long scrapeId;
-    private String source;
-    private Date lastSearched;
-    private Date lastScraped;
-    private String name;
-    private String description;
-    private String description_vector;
-    private String neighborhoodOverview;
-    private String pictureUrl;
-    private long hostId;
-    private String hostUrl;
-    private String hostName;
-    private Date hostSince;
-    private String hostLocation;
-    private String hostAbout;
-    private String hostResponseTime;
-    private String hostResponseRate;
-    private String hostAcceptanceRate;
-    private boolean hostIsSuperhost;
-    private String hostThumbnailUrl;
-    private String hostPictureUrl;
-    private String hostNeighbourhood;
-    private Integer hostListingsCount;
-    private Integer hostTotalListingsCount;
-    private String hostVerifications;
-    private boolean hostHasProfilePic;
-    private boolean hostIdentityVerified;
-    private String neighbourhood;
-    private boolean neighbourhoodCleansed;
-    private BigDecimal latitude;
-    private BigDecimal longitude;
-    private String propertyType;
-    private String roomType;
-    private Integer accommodates;
-    private Double bathrooms;
-    private String bathroomsText;
-    private Integer bedrooms;
-    private Integer beds;
-    private String price;
-    private Integer minimumNights;
-    private Integer maximumNights;
-    private Integer minimumMinimumNights;
-    private Integer maximumMinimumNights;
-    private Integer minimumMaximumNights;
-    private Integer maximumMaximumNights;
-    private Float minimumNightsAvgNtm;
-    private Float maximumNightsAvgNtm;
-    private String calendarUpdated;
-    private boolean hasAvailability;
-    private Integer availability30;
-    private Integer availability60;
-    private Integer availability90;
-    private Integer availability365;
-    private Date calendarLastScraped;
-    private Integer numberOfReviews;
-    private Integer numberOfReviewsLtm;
-    private Integer numberOfReviewsL30d;
-    private Date firstReview;
-    private Date lastReview;
-    private Float reviewScoresRating;
-    private Float reviewScoresAccuracy;
-    private Float reviewScoresCleanliness;
-    private Float reviewScoresCheckin;
-    private Float reviewScoresCommunication;
-    private Float reviewScoresLocation;
-    private Float reviewScoresValue;
-    private boolean requiresLicense;
-    private String license;
-    private boolean instantBookable;
-    private Integer calculatedHostListingsCount;
-    private Integer calculatedHostListingsCountEntireHomes;
-    private Integer calculatedHostListingsCountPrivateRooms;
-    private Integer calculatedHostListingsCountSharedRooms;
-    private Long regionId;
-    private String regionName;
-    private Long regionParentId;
-    private String regionParentName;
-    private Long regionParentParentId;
-    private String regionParentParentName;
-    private Float reviewsPerMonth;
-    private String titleSearchVector;
+
+public record Listing(long id, String listingUrl, long scrapeId, String source, Date lastScraped,
+                      String name, String description, String neighborhoodOverview, String pictureUrl, long hostId,
+                      String hostUrl, String hostName, Date hostSince, String hostLocation, String hostAbout,
+                      String hostResponseTime, String hostResponseRate, String hostAcceptanceRate,
+                      boolean hostIsSuperhost, String hostThumbnailUrl, String hostPictureUrl, String hostNeighbourhood,
+                      Integer hostListingsCount, Integer hostTotalListingsCount, String hostVerifications,
+                      boolean hostHasProfilePic, boolean hostIdentityVerified, String neighbourhood,
+                      boolean neighbourhoodCleansed, boolean neighbourhoodGroupCleansed, BigDecimal latitude,
+                      BigDecimal longitude, String propertyType, String roomType, Integer accommodates,
+                      Double bathrooms, String bathroomsText, Integer bedrooms, Integer beds, String price,
+                      Integer minimumNights, Integer maximumNights, Integer minimumMinimumNights,
+                      Integer maximumMinimumNights, Integer minimumMaximumNights, Integer maximumMaximumNights,
+                      Float minimumNightsAvgNtm, Float maximumNightsAvgNtm, String calendarUpdated,
+                      boolean hasAvailability, Integer availability30, Integer availability60, Integer availability90,
+                      Integer availability365, Date calendarLastScraped, Integer numberOfReviews,
+                      Integer numberOfReviewsLtm, Integer numberOfReviewsL30d, Date firstReview, Date lastReview,
+                      BigDecimal reviewScoresRating, BigDecimal reviewScoresAccuracy,
+                      BigDecimal reviewScoresCleanliness, BigDecimal reviewScoresCheckin,
+                      BigDecimal reviewScoresCommunication, BigDecimal reviewScoresLocation,
+                      BigDecimal reviewScoresValue, String license, boolean instantBookable,
+                      Integer calculatedHostListingsCount, Integer calculatedHostListingsCountEntireHomes,
+                      Integer calculatedHostListingsCountPrivateRooms, Integer calculatedHostListingsCountSharedRooms,
+                      BigDecimal reviewsPerMonth) {
+
 }
+        
+
