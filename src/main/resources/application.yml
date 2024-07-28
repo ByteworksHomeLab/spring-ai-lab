@@ -41,4 +41,6 @@ spring:
       chat:
         options:
           model: gpt-4o
-airbnbLoadListings: true
+etl:
+  airbnbLoadListings: true
+  clearAirbnbListingsTable: true

@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS listing
     id                                           BIGINT        NOT NULL,
     listing_url                                  TEXT,
     scrape_id                                    BIGINT        NOT NULL,
-    last_searched                                TIMESTAMP WITHOUT TIME ZONE,
     last_scraped                                 TIMESTAMP WITHOUT TIME ZONE,
     source                                       TEXT,
     name                                         TEXT,

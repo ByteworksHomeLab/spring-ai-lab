@@ -7,7 +7,6 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -42,11 +41,13 @@ public class ListingsEtl {
             "instant_bookable", "calculated_host_listings_count", "calculated_host_listings_count_entire_homes",
             "calculated_host_listings_count_private_rooms", "calculated_host_listings_count_shared_rooms", "reviews_per_month"};
 
-    public ListingsEtl(final ListingDao listingDao, @Value("${airbnbLoadListings:false}") final boolean loadListings) {
+    public ListingsEtl(final ListingDao listingDao, @Value("${airbnbLoadListings}") final boolean loadListings, @Value("${clearAirbnbListingsTable}") final boolean clearListingsTable) {
         this.listingDao = listingDao;
         log.info(String.format("airbnbLoadListings is set to %s", loadListings));
         if (loadListings) {
-            listingDao.deleteAll();
+            if (clearListingsTable) {
+                listingDao.deleteAll();
+            }
             readListingCsvFile("data/listings.csv");
         }
 
