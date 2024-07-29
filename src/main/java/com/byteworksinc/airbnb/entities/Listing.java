@@ -1,6 +1,7 @@
 package com.byteworksinc.airbnb.entities;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -28,7 +29,10 @@ public record Listing(@Id Long id, String listingUrl, Long scrapeId, String sour
                       BigDecimal reviewScoresValue, String license, boolean instantBookable,
                       Integer calculatedHostListingsCount, Integer calculatedHostListingsCountEntireHomes,
                       Integer calculatedHostListingsCountPrivateRooms, Integer calculatedHostListingsCountSharedRooms,
-                      BigDecimal reviewsPerMonth) {
+                      BigDecimal reviewsPerMonth,
+                      @Version
+                      Integer version
+        ) {
 
     public Listing {
         if (id == null) {

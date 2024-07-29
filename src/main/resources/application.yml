@@ -6,14 +6,17 @@ spring:
   ai:
     vectorstore:
       pgvector:
-      index-type: HNSW
-      distance-type: COSINE_DISTANCE
-      dimensions: 1536
+        dimensions: 1536
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
   datasource:
     url: jdbc:postgresql://localhost:5432/airbnb
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
 management:
   endpoints:
     web:

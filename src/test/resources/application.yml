@@ -1,16 +1,18 @@
 spring:
-  profiles:
-    default: llama3
+  sql:
+    init:
+      mode: always
   application:
     name: spring-ai-airbnb-test
+  profiles:
+    default: llama3
   ai:
-    openai:
-      api-key: ${OPENAI_API_KEY}
     vectorstore:
       pgvector:
-      index-type: HNSW
-      distance-type: COSINE_DISTANCE
-      dimensions: 1536
+        dimensions: 1536
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        initialize-schema: true
   datasource:
     url: jdbc:postgresql://localhost:5432/airbnb_test
     username: ${DB_USER}
@@ -39,6 +41,7 @@ spring:
       on-profile: "gpt-4o"
   ai:
     openai:
+      api-key: ${OPENAI_API_KEY}
       chat:
         options:
           model: gpt-4o

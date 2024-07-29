@@ -48,7 +48,7 @@ so it used my MaxOS username. Normally, the username is "postgres."
 To test the Postgres credentials, as shown above, I added connections to the Intellij Database console for both the `airbnb` and `airbnb_test` databases. 
 
 #### Load the "Prod" Schema
-The last piece of the PostgreSQL set up is to load the schema found in [src/main/resources/data/postgres-schema.ddl](src%2Fmain%2Fresources%2Fdata%2Fpostgres-schema.ddl) 
+The last piece of the PostgreSQL set up is to load the schema found in [src/main/resources/data/schema.sql](src%2Fmain%2Fresources%2Fdata%2Fpostgres-schema.ddl) 
 into the `airbnb` database. Don't worry about the schema for the `airbnb_test` database. Spring Test takes care of that for you.
 
 ### 2) Ollama

@@ -1,11 +1,13 @@
 package com.byteworksinc.airbnb.etl;
 
-import com.byteworksinc.airbnb.dao.ListingDao;
+import com.byteworksinc.airbnb.dao.ListingRepository;
 import com.byteworksinc.airbnb.entities.Listing;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -23,8 +25,10 @@ import java.util.Locale;
 
 @Slf4j
 @Component
-public class ListingsEtl {
-    private final ListingDao listingDao;
+public class ListingsEtl implements CommandLineRunner {
+    private final ListingRepository listingRepository;
+    private final boolean loadListings;
+    private final boolean clearListingsTable;
 
     private final String[] headers = {"id", "listing_url", "scrape_id", "last_scraped", "source", "name", "description",
             "neighborhood_overview", "picture_url", "host_id", "host_url", "host_name", "host_since", "host_location",
@@ -41,16 +45,21 @@ public class ListingsEtl {
             "instant_bookable", "calculated_host_listings_count", "calculated_host_listings_count_entire_homes",
             "calculated_host_listings_count_private_rooms", "calculated_host_listings_count_shared_rooms", "reviews_per_month"};
 
-    public ListingsEtl(final ListingDao listingDao, @Value("${airbnbLoadListings}") final boolean loadListings, @Value("${clearAirbnbListingsTable}") final boolean clearListingsTable) {
-        this.listingDao = listingDao;
+    public ListingsEtl(final ListingRepository listingRepository, @Value("${airbnbLoadListings}") final boolean loadListings, @Value("${clearAirbnbListingsTable}") final boolean clearListingsTable) {
+        this.listingRepository = listingRepository;
+        this.loadListings = loadListings;
+        this.clearListingsTable = clearListingsTable;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
         log.info(String.format("airbnbLoadListings is set to %s", loadListings));
         if (loadListings) {
             if (clearListingsTable) {
-                listingDao.deleteAll();
+                listingRepository.deleteAll();
             }
             readListingCsvFile("data/listings.csv");
         }
-
     }
 
     public void readListingCsvFile(final String path) {
@@ -128,8 +137,8 @@ public class ListingsEtl {
                     getInteger(record, "minimum_maximum_nights"),
                     getInteger(record, "maximum_minimum_nights"),
                     getInteger(record, "maximum_maximum_nights"),
-                    getFloat(record, "minimum_nights_avg_ntm"),
-                    getFloat(record, "maximum_nights_avg_ntm"),
+                    getMaxFloat(record, "minimum_nights_avg_ntm", 2000F),
+                    getMaxFloat(record, "maximum_nights_avg_ntm", 2000F),
                     record.get("calendar_updated"),
                     getBoolean(record, "has_availability"),
                     getInteger(record, "availability_30"),
@@ -155,12 +164,13 @@ public class ListingsEtl {
                     getInteger(record, "calculated_host_listings_count_entire_homes"),
                     getInteger(record, "calculated_host_listings_count_private_rooms"),
                     getInteger(record, "calculated_host_listings_count_shared_rooms"),
-                    getBigDecimal(record, "reviews_per_month", 2)
+                    getBigDecimal(record, "reviews_per_month", 2),
+                    null
             );
             if (count % 500 == 0) {
                 log.info(String.format("Saving listing %s.", count));
             }
-            listingDao.save(listing);
+            listingRepository.save(listing);
         }
         log.info(String.format("Wrote %s listings.", count));
     }
@@ -207,12 +217,16 @@ public class ListingsEtl {
         return false;
     }
 
-    private Float getFloat(CSVRecord record, String columnName) {
+    private Float getMaxFloat(CSVRecord record, String columnName, Float max) {
         if (record != null && columnName != null) {
             String value = record.get(columnName);
             if (value != null && !value.isEmpty()) {
                 try {
-                    return Float.parseFloat(value);
+                    float rawValue = Float.parseFloat(value);
+                    if (rawValue > max) {
+                        return max;
+                    }
+                    return rawValue;
                 } catch (NumberFormatException e) {
                     log.warn(String.format("Could not parse Float %s", value));
                 }
@@ -261,4 +275,5 @@ public class ListingsEtl {
         }
         return null;
     }
+
 }

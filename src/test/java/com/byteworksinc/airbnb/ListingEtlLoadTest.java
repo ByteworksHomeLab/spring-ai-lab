@@ -1,6 +1,6 @@
 package com.byteworksinc.airbnb;
 
-import com.byteworksinc.airbnb.dao.ListingDao;
+import com.byteworksinc.airbnb.dao.ListingRepository;
 import com.byteworksinc.airbnb.entities.Listing;
 import com.byteworksinc.airbnb.etl.ListingsEtl;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 
@@ -17,14 +17,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @Rollback(true)
-@Sql({"/test-schema.ddl"})
+@Sql({"/schema.sql"})
+@Testcontainers
 public class ListingEtlLoadTest {
 
     @Autowired
     private ListingsEtl listingsEtl;
 
     @Autowired
-    private ListingDao listingDao;
+    private ListingRepository listingDao;
 
     @Test
     public void testReadListingCsvFile() {

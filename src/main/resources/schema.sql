@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS listing
     source                                       TEXT,
     name                                         TEXT,
     description                                  TEXT,
-    description_embedding                        VECTOR,
     neighborhood_overview                        TEXT,
     picture_url                                  TEXT,
     host_id                                      BIGINT        NOT NULL,
@@ -48,14 +47,14 @@ CREATE TABLE IF NOT EXISTS listing
     maximum_minimum_nights                       INTEGER,
     minimum_maximum_nights                       INTEGER,
     maximum_maximum_nights                       INTEGER,
-    minimum_nights_avg_ntm                       NUMERIC(11, 2),
-    maximum_nights_avg_ntm                       NUMERIC(11, 2),
+    minimum_nights_avg_ntm                       NUMERIC(7, 2),
+    maximum_nights_avg_ntm                       NUMERIC(7, 2),
     calendar_updated                             TEXT,
     has_availability                             BOOLEAN       NOT NULL,
-    availability_30                              INTEGER,
-    availability_60                              INTEGER,
-    availability_90                              INTEGER,
-    availability_365                             INTEGER,
+    availability30                               INTEGER,
+    availability60                               INTEGER,
+    availability90                               INTEGER,
+    availability365                              INTEGER,
     calendar_last_scraped                        TIMESTAMP WITHOUT TIME ZONE,
     number_of_reviews                            INTEGER       NOT NULL,
     number_of_reviews_ltm                        INTEGER       NOT NULL,
@@ -82,9 +81,10 @@ CREATE TABLE IF NOT EXISTS listing
     region_parent_name                           TEXT,
     region_parent_parent_id                      BIGINT,
     region_parent_parent_name                    TEXT,
-    reviews_per_month                            NUMERIC,
+    reviews_per_month                            NUMERIC(5, 2),
+    version                                      INTEGER,
     CONSTRAINT "PKListing_01" PRIMARY KEY ("id")
-    );
+);
 
 CREATE INDEX  IF NOT EXISTS "IDXAirbnb_02"
     on listing (host_id);
@@ -97,3 +97,4 @@ CREATE INDEX IF NOT EXISTS "IDXAirbnb_04"
 
 CREATE INDEX IF NOT EXISTS "IDXAirbnb_05"
     on listing (bedrooms);
+
