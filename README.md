@@ -135,15 +135,13 @@ Spring Boot also needs the environment variables exported to in the terminal or 
 The default Maven profile is "ollama," and the default Spring profile is "llama3," so if that is all you need, then a simple `mvn spring-boot:run` 
 is all you need.
 ```shell
-# Default Maven profile is "ollama" and the default Spring profile is "llama3"
 mvn spring-boot:run 
 ```
 
 If you want to use OpenAI, then you must set the Maven profile to "openapi" and Spring profile to "gpt-40."
 
 ```shell
-# Sets Maven profile to "openapi" and spring profile to "gpt-40"
-mvn -Popenai -spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=gpt-4o"
+mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=gpt-3.5-turbo"
 ```
 
 ## Spring AI

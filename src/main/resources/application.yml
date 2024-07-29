@@ -37,13 +37,13 @@ spring:
 spring:
   config:
     activate:
-      on-profile: "gpt-4o"
+      on-profile: "gpt-3.5-turbo"
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
       chat:
         options:
-          model: gpt-4o
+          model: gpt-3.5-turbo
 etl:
   airbnbLoadListings: false
   clearAirbnbListingsTable: false
