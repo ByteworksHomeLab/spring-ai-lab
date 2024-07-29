@@ -48,4 +48,4 @@ spring:
 
 etl:
   airbnbLoadListings: false
-  clearAirbnbListingsTable: true
+  clearAirbnbListingsTable: false

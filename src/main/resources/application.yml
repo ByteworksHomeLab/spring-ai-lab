@@ -45,5 +45,5 @@ spring:
         options:
           model: gpt-4o
 etl:
-  airbnbLoadListings: true
-  clearAirbnbListingsTable: true
+  airbnbLoadListings: false
+  clearAirbnbListingsTable: false

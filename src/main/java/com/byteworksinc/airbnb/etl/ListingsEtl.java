@@ -52,12 +52,15 @@ public class ListingsEtl implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
-        log.info(String.format("airbnbLoadListings is set to %s", loadListings));
+    public void run(String... args) {
+        log.info(String.format("ListingsETL is starting. Listing records is %s", listingRepository.count()));
+        if (clearListingsTable) {
+            log.info("ListingsETL is clearing the Listings table");
+            listingRepository.deleteAll();
+        }
+        // This isn't testing listingRepository.count() because it slowed down the unit tests.
         if (loadListings) {
-            if (clearListingsTable) {
-                listingRepository.deleteAll();
-            }
+            log.info("ListingsETL is loading the Listings table");
             readListingCsvFile("data/listings.csv");
         }
     }

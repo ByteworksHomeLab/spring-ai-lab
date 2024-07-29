@@ -5,10 +5,19 @@ services:
     image: 'pgvector/pgvector:pg16'
     ports:
       - 5432:5432
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    # or set shared memory limit when deploy via swarm stack
+    volumes:
+      - db:/var/lib/postgresql/data
     environment:
       - 'POSTGRES_USER=${DB_USER}'
-      - 'POSTGRES_DB=airbnb_test'
+      - 'POSTGRES_DB=airbnb'
       - 'POSTGRES_PASSWORD=${DB_PASSWORD}'
     labels:
       - "org.springframework.boot.services-connection=postgres"
       - '5432'
+volumes:
+  db:
+    driver: local
