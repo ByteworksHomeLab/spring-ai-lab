@@ -6,9 +6,7 @@ services:
     ports:
       - 5432:5432
     restart: always
-    # set shared memory limit when using docker-compose
     shm_size: 128mb
-    # or set shared memory limit when deploy via swarm stack
     volumes:
       - db:/var/lib/postgresql/data
     environment:

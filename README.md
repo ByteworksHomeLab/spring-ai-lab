@@ -32,28 +32,67 @@ and it performs great in my home lab.
 
 This project demonstrates a few different concepts, and as a result, it has a few prerequisites.
 
-### 1) PostgreSQL
+### 1) Set your environment variables.
 
-PostgreSQL is used as the vector database for the project. To run the project, install PostgreSQL with the PGVector extension.
+Before using the commands `docker compose up,` `mvn spring-boot,` or `mvn clean test` in a terminal, you must first export the variables needed by the `docker-compose.yaml` and  `application.yml` files.
 
-Next, create two databases:
-- __airbnb__—This is the database the REST API. You connect to the `airbnb` database when running `mvn spring-boot:run`.
-- __airbnb_test__—Since the Airbnb Listing model uses a vector column, and the H2 database doesn't support the vector column type, this project uses PostgreSQL for Junit tests too. The Junit tests connect to the `airbnb_test` database.
+Create a new file in the root of the project named `env.sh.` It is already included in the `.gitignore` file. Add these three export statements. We'll talk about the OpenAI API key in a bit.
 
-You'll need to set up the username and password for the Airbnb databases. I used Homebrew to install PostgreSQL on my Macbook, 
-so it used my MaxOS username. Normally, the username is "postgres." 
+```shell
+export DB_USER=my-postgres-username
+export DB_PASSWORD=my-postgres-password
+export OPENAI_API_KEY=my-openai-api-key
+```
 
-![PostgreSQL Databases](src/main/resources/static/postgresdbs.png)
+Use the ". ./path" syntax to on Mac or Windows to add the environment variables to the terminal session.
 
-To test the Postgres credentials, as shown above, I added connections to the Intellij Database console for both the `airbnb` and `airbnb_test` databases. 
+```shell
+. ./env.sh
+```
 
-#### Load the "Prod" Schema
-The last piece of the PostgreSQL set up is to load the schema found in [src/main/resources/data/schema.sql](src%2Fmain%2Fresources%2Fdata%2Fpostgres-schema.ddl) 
-into the `airbnb` database. Don't worry about the schema for the `airbnb_test` database. Spring Test takes care of that for you.
+To run the application, tests, or Docker Compose from your IDE, add the environment variables to the runtime configuration in your IDE.
+This screenshot shows my configuration for the JUnit tests to run inside Intellij. Do the same thing for Application.java if you like.
 
-### 2) Ollama
+![IntelliJ Runtime](src/main/resources/static/intellij-runtime.png)
 
-For this lab, we are running LLMs on a Docker image of [Ollama](https://ollama.com/).
+### 2) PostgreSQL
+
+PostgreSQL is used as the vector database for the project. On macOS, run this command from the root of the project to start Postgres. On Linux, the command is `docker-compose up.`
+
+```shell
+. ./env.sh
+docker compose up -d
+```
+
+If you use Intellij, you can right-click the `docker-compose.yaml` YAML file and then select `run.` 
+
+The Docker Compose file uses a volume, so the records and embeddings are preserved between runs.
+
+```yaml
+services:
+  postgres:
+    image: 'pgvector/pgvector:pg16'
+    ports:
+      - 5432:5432
+    restart: always
+    shm_size: 128mb
+    volumes:
+      - db:/var/lib/postgresql/data
+    environment:
+      - 'POSTGRES_USER=${DB_USER}'
+      - 'POSTGRES_DB=airbnb'
+      - 'POSTGRES_PASSWORD=${DB_PASSWORD}'
+    labels:
+      - "org.springframework.boot.services-connection=postgres"
+      - '5432'
+volumes:
+  db:
+    driver: local
+```
+
+### 3) Ollama
+
+For this lab, we are running LLMs on a Docker image of [Ollama](https://ollama.com/). In the future, I should put Ollama and Ollama-web it in the Docker Compose file, but I haven't gotten around to it yet.
 
 Ollama is an opensource platform for running LLMs (Large Language Models) locally. It makes it easier to get started with AI by hiding the complexities 
 of running a LLM (Large Language Model). You can download the [Ollama Docker image](https://hub.docker.com/r/ollama/ollama), or you can [download the binary to your operating system](https://ollama.com/download/). 
@@ -96,24 +135,9 @@ and Minstral on my M1 MacBook. Choose the best runtime option for your situation
 Confirm that the Ollama API is ready by navigating to [http://localhost:11434](http://localhost:11434) in a web browser. It returns the text 
 "Ollama is running."
 
-### 3) OpenIA
+### 4) OpenIA
 
 In addition to running LLM models locally on Ollama, this project also demonstrates connecting to the OpenAPI key, so create an OpenAI API Key.
-
-### 4) Set your environment variables.
-
-Before using the command `mvn spring-boot run` in a terminal, you must export the variables needed by the `application.yml` file:
-
-```shell
-export DB_USER=my-postgres-username
-export DB_PASSWORD=my-postgres-password
-export OPENAI_API_KEY=my-openai-api-key
-```
-
-Likewise, to run the JUnit tests or to run the application from your IDE, add the environment variables to the runtime configuration in your IDE. 
-This screenshot shows my configuration for the JUnit tests to run inside Intellij. Do the same thing for Application.java if you like.
-
-![IntelliJ Runtime](src/main/resources/static/intellij-runtime.png)
 
 ## Project Testing
 
@@ -121,10 +145,7 @@ You should now be able to execute the unit test from your IDE, or from the comma
 environmental variables in your terminal.
 
 ```shell
-export DB_USER=my-postgres-username
-export DB_PASSWORD=my-postgres-password
-export OPENAI_API_KEY=my-openai-api-key
-
+. ./env.sh
 mvn clean test
 ```
 
@@ -135,12 +156,14 @@ Spring Boot also needs the environment variables exported to in the terminal or 
 The default Maven profile is "ollama," and the default Spring profile is "llama3," so if that is all you need, then a simple `mvn spring-boot:run` 
 is all you need.
 ```shell
+. ./env.sh
 mvn spring-boot:run 
 ```
 
-If you want to use OpenAI, then you must set the Maven profile to "openapi" and Spring profile to "gpt-40."
+If you want to use OpenAI, then you must set the Maven profile to "openapi" and Spring profile to "gpt-3.5-turbo."
 
 ```shell
+. ./env.sh
 mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=gpt-3.5-turbo"
 ```
 
