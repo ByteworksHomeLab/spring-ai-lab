@@ -1,6 +1,7 @@
 # Spring AI Lab
 #### https://github.com/ByteworksHomeLab/spring-ai-lab
-This project is an introduction to Spring AI. It demonstrates running two LLMs, Llama 3 on the Ollama platform and OpenAI, using a combination of Maven profiles and Spring profiles to switch back and forth.
+This project is an introduction to Spring AI. It demonstrates running two LLMs, Llama 3 on the Ollama platform and OpenAI, using a combination of Maven profiles and Spring 
+profiles to switch back and forth.
 
 The project relies on Docker for simplicity.
 
@@ -10,7 +11,8 @@ The JUnit tests each use Docker Test Containers to dynamically spin up a Postgre
 Likewise, the Spring Boot AI application relies on Docker Compose to spin up an Ollama instance and a Postgres PGVector instance. Well, technically. you have to spin up Docker Compose yourself.
 
 ## Audience
-The audience or this project is Spring Framework application developers who are new to artificial intelligence. It is expected that you know your way around the Spring Framework, but we don't assume any AI experience.
+The audience or this project is Spring Framework application developers who are new to artificial intelligence. It is expected that you know your way around the Spring Framework, 
+but we don't assume any AI experience.
 
 ## Use Cases
 Your employer asks you to:
@@ -39,139 +41,135 @@ and it performs great in my home lab.
 
 This project demonstrates a few different concepts, and as a result, it has a few prerequisites.
 
-### 1) Set your environment variables.
+### 1) Java
 
-Before using the commands `docker compose up,` `mvn spring-boot,` or `mvn clean test` in a terminal, you must first export the variables needed by the `docker-compose.yaml` and  `application.yml` files.
+This project is using Java 22, but a lower version of Java should work too if you update the Java version in the pom. Grab the latest version of Java. [SDK Man](https://sdkman.io/) is the 
+easiest way to switch around SDK versions.
 
-Create a new file in the root of the project named `env.sh.` It is already included in the `.gitignore` file. Add these three export statements. We'll talk about the OpenAI API key in a bit.
+### 2) Maven
+
+This project was built using Maven 3.9.8, but any recent version of Maven will be fine.
+
+```Shell
+sdk install java 22.0.1-tem
+sdk use java 22.0.1-tem
+```
+
+### 3) PostgreSQL
+
+PostgreSQL is used as the vector database for the project. Specifically, we are using the PGVector Docker image that includes vector database support.
+PGVector is defined in the `docker-compose.yaml` at the root of the project.
+
+### 4) Ollama
+
+Ollama is an opensource platform for running LLMs (Large Language Models) locally. It makes it easier to get started with AI by hiding the complexities
+of running a LLM (Large Language Model). You can download the [Ollama Docker image](https://hub.docker.com/r/ollama/ollama), or you can [download the binary to your operating system](https://ollama.com/download/).
+Choose the best runtime option for your situation.
+
+Ollama supports many different LLMs. Visit the [Ollama models page](https://ollama.com/library) for the list of supported LLMs, ranked by popularity.
+
+![ollama-models.png](src/main/resources/static/ollama-models.png) 
+
+For this example, we will use [Meta's llama 3](https://llama.meta.com/llama3/). Ollama is also specified in the `docker-compose.yaml` file at the root of the project.
+
+### 5) OpenIA
+
+In addition to running LLM models locally, this project demonstrates connecting to the OpenAI API. For that, you'll need to create an OpenAI API Key. You can use a free 
+OpenAI account. Later, when you bump up against rate limiting, you can upgrade to a pay-as-you-go account. 
+
+[Here is the link to create an OpenAI API key](https://platform.openai.com/settings/profile?tab=api-keys). Be sure to save the API Key somewhere safe when you create it. 
+We'll use it in an environment variable below.
+
+### 6) Set your environment variables.
+
+Before running any `docker compose,` or `mvn` commands in a terminal, you must first export the variables needed by the `docker-compose.yaml` and  `application.yml` files.
+
+I found it convenient running the variable exports from script file, `env.sh,` in the root of the project. Use any credentials you want for Postgres, plus your OpenAI API key created above.
 
 ```shell
+#!/bin/bash
 export DB_USER=my-postgres-username
 export DB_PASSWORD=my-postgres-password
 export OPENAI_API_KEY=my-openai-api-key
 ```
 
-Use the ". ./path" syntax to on Mac or Windows to add the environment variables to the terminal session.
+Use the ". ./path" syntax to on Mac or Linux to add the environment variables to the terminal session.
 
 ```shell
 . ./env.sh
 ```
-
-To run the application, tests, or Docker Compose from your IDE, add the environment variables to the runtime configuration in your IDE.
-This screenshot shows my configuration for the JUnit tests to run inside Intellij. Do the same thing for Application.java if you like.
+To run the application, tests, or `Docker Compose` from your IDE, add the environment variables to the runtime configurations in your IDE too. This screenshot shows the 
+configuration for the JUnit tests in Intellij. Do the same thing for Application.java or Docker if you like.
 
 ![IntelliJ Runtime](src/main/resources/static/intellij-runtime.png)
 
-### 2) PostgreSQL
+### Launch Ollama and PGVector Together Using Docker Compose for the First Time
+Now, you are ready to try out the `Docker Compose` file. Normally, Spring Boot `spring-boot-docker-compose` starts Docker Compose automatically, but we want to do some housekeeping first.
 
-PostgreSQL is used as the vector database for the project. On macOS, run this command from the root of the project to start Postgres. On Linux, the command is `docker-compose up.`
-
-```shell
-. ./env.sh
-docker compose up -d
-```
-
-If you use Intellij, you can right-click the `docker-compose.yaml` YAML file and then select `run.` 
-
-The Docker Compose file uses a volume, so the records and embeddings are preserved between runs.
-
-```yaml
-services:
-  postgres:
-    image: 'pgvector/pgvector:pg16'
-    ports:
-      - 5432:5432
-    restart: always
-    shm_size: 128mb
-    volumes:
-      - db:/var/lib/postgresql/data
-    environment:
-      - 'POSTGRES_USER=${DB_USER}'
-      - 'POSTGRES_DB=airbnb'
-      - 'POSTGRES_PASSWORD=${DB_PASSWORD}'
-    labels:
-      - "org.springframework.boot.services-connection=postgres"
-      - '5432'
-volumes:
-  db:
-    driver: local
-```
-
-### 3) Ollama
-
-For this lab, we are running LLMs on a Docker image of [Ollama](https://ollama.com/). 
-
-Ollama is an opensource platform for running LLMs (Large Language Models) locally. It makes it easier to get started with AI by hiding the complexities 
-of running a LLM (Large Language Model). You can download the [Ollama Docker image](https://hub.docker.com/r/ollama/ollama), or you can [download the binary to your operating system](https://ollama.com/download/). 
-Choose the best runtime option for your situation.
-
-Ollama supports many different LLMs. Visit the [Ollama models page](https://ollama.com/library) for the list of supported LLMs, ranked by popularity.
-
-![ollama-models.png](src/main/resources/static/ollama-models.png)
-
-For this example, we will use [Meta's llama 3](https://llama.meta.com/llama3/).
-
-### Launch Ollama and PGVector Together Using Docker Compose
-We've taken care of Ollama for you by including it in the Docker Compose file. Run these commands to launch it and then install the llama3 LLM model.
+Start `Docker Compose` from the root of the project as you normally would.
 
 ```shell
 . ./env.sh
 docker compose up -d
-docker exec -it ollama ollama run llama3
 ```
 
-### Launch Ollama as a separate Docker Container
-If you choose to run Ollama outside of Docker Compose, follow these commands.
-
-```Shell
-docker pull ollama/ollama
-docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
-docker exec -it ollama ollama run llama3
-```
-
-The last command above installs llama3 on your Ollama Docker container and starts an interactive terminal. Spring AI will call the Ollama API, 
-but you can test the command line now.
+Verify that Postgres and Ollama are working by using the `docker compose ps` command.
 
 ```shell
->>> tell me a joke
-Here's one:
+docker compose ps
 
-Why couldn't the bicycle stand up by itself?
+NAME       IMAGE                    COMMAND                  SERVICE    CREATED         STATUS         PORTS
+ollama     ollama/ollama            "/bin/ollama serve"      ollama     3 minutes ago   Up 8 seconds   0.0.0.0:11434->11434/tcp
+postgres   pgvector/pgvector:pg16   "docker-entrypoint.s…"   postgres   3 minutes ago   Up 8 seconds   0.0.0.0:5432->5432/tcp
+```
 
-(wait for it...)
+You can also confirm that the Ollama API is ready by navigating to [http://localhost:11434](http://localhost:11434) in a web browser. It should return the message: "Ollama is running."
 
-Because it was two-tired!
+Next, install the LLama3 LLM using the `ollama` CLI installed on the Ollama Docker container.
 
-Hope that made you smile! Do you want to hear another?
+```shell
+docker exec -it ollama ollama run llama3
+```
+
+The first time you issue the Ollama `run` command it downloads and installs the LLM. When it does, your terminal session may time out, but the LLM was probably successfully installed. 
+Reconnect to the Ollama Docker container to rerun the `ollama run llama3` This time Ollama prompt returns quickly since the llama3 LLM is already installed. Try asking it a question.
+
+```shell
+docker exec -it ollama ollama run llama3
+
+>>> You are a newly installed LLM. Please tell me about yourself in six lines or less.
+
+I'm FriendlyLinguist-1.0, a newly installed Large Language Model.
+My training data consists of approximately 100 million parameters.
+I'm designed to engage in natural-sounding conversations and answer questions.
+My personality traits include being friendly, curious, empathetic, and supportive.
+I'm still learning and improving, but I'm excited to chat with you!
+Let's get started!
 
 >>>/bye
 ```
-You can install more than one LLM on Ollama, but I filled up my Docker volume when I tried it on my Intel MacBook. There was no problem running Llama 3
-and Minstral on my M1 MacBook. Choose the best runtime option for your situation. 
 
-Confirm that the Ollama API is ready by navigating to [http://localhost:11434](http://localhost:11434) in a web browser. It returns the text 
-"Ollama is running."
-
-### 4) OpenIA
-
-In addition to running LLM models locally on Ollama, this project also demonstrates connecting to the OpenAPI key, so create an OpenAI API Key.
+That's it. Llama3 is ready to use with Spring AI. Follow the same process to run other [models found on the Ollama website](https://ollama.com/library).
 
 ## Project Testing
 
-You should now be able to execute the unit test from your IDE, or from the command line. If using the command line, be sure to export the 
-environmental variables in your terminal.
+You should now be able to execute the unit tests from your IDE, or from the command line. Be sure to export the 
+environmental variables in your terminal or IDE runtime configuration.
 
 ```shell
 . ./env.sh
 mvn clean test
 ```
 
-## Spring Boot Execution
+## Spring Boot Run
 
-Spring Boot also needs the environment variables exported to in the terminal or added to your IDE's runtime configuration.
+Spring Boot also needs the environment variables exported to in the terminal or added to your IDE's runtime configuration. Once the environment variables are exported, `spring-boot-docker-compose` automatically brings up Docker Compose whenever Spring Boot is run.
+
+![spring-boot-run-docker-compose.png](src%2Fmain%2Fresources%2Fstatic%2Fspring-boot-run-docker-compose.png)
 
 The default Maven profile is "ollama," and the default Spring profile is "llama3," so if that is all you need, then a simple `mvn spring-boot:run` 
-is all you need.
+will suffice.
+
 ```shell
 . ./env.sh
 mvn spring-boot:run 
@@ -181,19 +179,11 @@ If you want to use OpenAI, then you must set the Maven profile to "openapi" and 
 
 ```shell
 . ./env.sh
-mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=gpt-3.5-turbo"
+mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=gpt-4o"
 ```
 
 ## Spring AI
-Okay, now that know how to run everything in the GitHub Project, set up a Spring AI project, starting with Java, Maven and an IDE.
-
-### Java JVM
-Grab the latest version of Java. [SDK Man](https://sdkman.io/) is the easiest way to switch around SDK versions.
-
-```Shell
-sdk install java 22.0.1-tem
-sdk use java 22.0.1-tem
-```
+Okay, now that you know how to run everything in this GitHub Project, it's your turn to set up your own Spring AI project.
 
 ### Spring AI Library
 Use [Spring Initializr](https://start.spring.io) to create a project with the dependencies shown below:
@@ -216,7 +206,7 @@ spring:
       embedding.model: llama3
 ```
 
-For OpenAI it might look like this:
+Here is a bare-bones properties file for Ollama3.
 
 ```yaml
 spring:
@@ -229,5 +219,9 @@ spring:
         options:
           model: gpt-4o
 ```
+
+This project uses Spring profiles to control which properties are loaded. It also uses Maven profiles in the [pom.xml](pom.xml) file to control which dependencies are loaded.
+
+
 
 
