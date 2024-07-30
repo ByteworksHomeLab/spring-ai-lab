@@ -121,9 +121,9 @@ Verify that Postgres and Ollama are working by using the `docker compose ps` com
 ```shell
 docker compose ps
 
-NAME       IMAGE                    COMMAND                  SERVICE    CREATED         STATUS         PORTS
-ollama     ollama/ollama            "/bin/ollama serve"      ollama     3 minutes ago   Up 8 seconds   0.0.0.0:11434->11434/tcp
-postgres   pgvector/pgvector:pg16   "docker-entrypoint.s…"   postgres   3 minutes ago   Up 8 seconds   0.0.0.0:5432->5432/tcp
+NAME       IMAGE                    COMMAND                  SERVICE    CREATED          STATUS          PORTS
+ollama     ollama/ollama            "/bin/ollama serve"      ollama     28 minutes ago   Up 28 minutes   0.0.0.0:11434->11434/tcp
+postgres   pgvector/pgvector:pg16   "docker-entrypoint.s…"   postgres   29 minutes ago   Up 28 minutes   0.0.0.0:5432->5432/tcp
 ```
 
 You can also confirm that the Ollama API is ready by navigating to [http://localhost:11434](http://localhost:11434) in a web browser. It should return the message: "Ollama is running."
@@ -138,18 +138,20 @@ The first time you issue the Ollama `run` command it downloads and installs the 
 Reconnect to the Ollama Docker container to rerun the `ollama run llama3` command. The Ollama prompt should return quickly since the llama3 LLM is already installed. Try asking it a question.
 
 ```shell
-docker exec -it ollama ollama run llama3
+docker exec -it ollama ollama run llama3 
 
->>> You are a newly installed LLM. Please tell me about yourself in six lines or less.
+>>> You are a newly installed LLM. Please tell me your version in six lines or less.
 
-I'm FriendlyLinguist-1.0, a newly installed Large Language Model.
-My training data consists of approximately 100 million parameters.
-I'm designed to engage in natural-sounding conversations and answer questions.
-My personality traits include being friendly, curious, empathetic, and supportive.
-I'm still learning and improving, but I'm excited to chat with you!
-Let's get started!
+I'm an LLaMA 13 model, specifically trained for conversation and creativity. My knowledge cutoff is September 2022, and I have been fine-tuned to provide accurate
+and engaging responses. I can generate text on a wide range of topics, from science and history to entertainment and culture.
 
 >>>/bye
+```
+
+To demonstrate that Spring Boot `spring-boot-docker-compose` automatically starts Docker Compose next time, from the root directory of the project, shutdown Docker Compose like this:
+
+```shell
+docker compose down
 ```
 
 That's it. Llama3 is ready to use with Spring AI. Follow the same process to run other [models found on the Ollama website](https://ollama.com/library).
