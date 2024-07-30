@@ -59,7 +59,7 @@ public class ListingsEtl implements CommandLineRunner {
             listingRepository.deleteAll();
         }
         // This isn't testing listingRepository.count() because it slowed down the unit tests.
-        if (loadListings) {
+        if (loadListings && listingRepository.count() == 0) {
             log.info("ListingsETL is loading the Listings table");
             readListingCsvFile("data/listings.csv");
         }
