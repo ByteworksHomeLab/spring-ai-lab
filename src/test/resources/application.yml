@@ -33,18 +33,18 @@ spring:
       base-url: http://10.0.0.7:11434
       chat:
         options:
-          model: llama3
+          model: llama3.1:8b
 ---
 spring:
   config:
     activate:
-      on-profile: "gpt-3.5-turbo"
+      on-profile: "gpt-4o"
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
       chat:
         options:
-          model: gpt-3.5-turbo
+          model: gpt-4o
 
 etl:
   airbnbLoadListings: false

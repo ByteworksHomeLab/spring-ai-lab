@@ -73,7 +73,7 @@ Ollama supports many different LLMs. Visit the [Ollama models page](https://olla
 
 ![ollama-models.png](src/main/resources/static/ollama-models.png) 
 
-For this example, we will use [Meta's llama 3](https://llama.meta.com/llama3/). 
+For this example, we will use [Meta's llama 3.1:8b](https://ollama.com/library/llama3.1). 
 
 ### 5) OpenAI
 
@@ -131,14 +131,14 @@ You can also confirm that the Ollama API is ready by navigating to [http://local
 Next, install the LLama3 LLM using the `ollama` CLI installed on the Ollama Docker container.
 
 ```shell
-docker exec -it ollama ollama run llama3
+docker exec -it ollama ollama run llama3.1:8b
 ```
 
 The first time you issue the Ollama `run` command it downloads and installs the LLM. Your terminal session may time out during the installation, but the LLM was probably successfully installed. 
-Reconnect to the Ollama Docker container to rerun the `ollama run llama3` command. The Ollama prompt should return quickly since the llama3 LLM is already installed. Try asking it a question.
+Reconnect to the Ollama Docker container to rerun the `ollama run llama3.1:8b` command. The Ollama prompt should return quickly since the llama3 LLM is already installed. Try asking it a question.
 
 ```shell
-docker exec -it ollama ollama run llama3 
+docker exec -it ollama ollama run llama3.1:8b
 
 >>> You are a newly installed LLM. Please tell me your version in six lines or less.
 
@@ -207,8 +207,7 @@ spring:
     ollama:
       base-url: http://localhost:11434
       chat:
-        model: llama3
-      embedding.model: llama3
+        model: llama3.1:8b
 ```
 
 Here is a bare-bones properties file for Ollama3.
