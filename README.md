@@ -1,10 +1,17 @@
 # Spring AI Lab
 #### https://github.com/ByteworksHomeLab/spring-ai-lab
 This project is an introduction to Spring AI. It demonstrates running two LLMs, Llama 3 on the Ollama platform and OpenAI, using a combination of Maven profiles and Spring profiles to switch back and forth.
+
+The project relies on Docker for simplicity.
+
+![Spring AI Ollama.png](src%2Fmain%2Fresources%2Fstatic%2FSpring%20AI%20Ollama.png)
+
+The JUnit tests each use Docker Test Containers to dynamically spin up a Postgres PGVector Docker instance for testing.
+Likewise, the Spring Boot AI application relies on Docker Compose to spin up an Ollama instance and a Postgres PGVector instance. Well, technically. you have to spin up Docker Compose yourself.
+
 ## Audience
 The audience or this project is Spring Framework application developers who are new to artificial intelligence. It is expected that you know your way around the Spring Framework, but we don't assume any AI experience.
 
-The main takeaway is that as a Spring developer, you can start using AI in your Spring applications today as easily as you use the other Spring Framework libraries.
 ## Use Cases
 Your employer asks you to:
 - Improve your Spring Customer Service App by combining the company's Knowledge base with a natural language AI interface.
@@ -92,7 +99,7 @@ volumes:
 
 ### 3) Ollama
 
-For this lab, we are running LLMs on a Docker image of [Ollama](https://ollama.com/). In the future, I should put Ollama and Ollama-web it in the Docker Compose file, but I haven't gotten around to it yet.
+For this lab, we are running LLMs on a Docker image of [Ollama](https://ollama.com/). 
 
 Ollama is an opensource platform for running LLMs (Large Language Models) locally. It makes it easier to get started with AI by hiding the complexities 
 of running a LLM (Large Language Model). You can download the [Ollama Docker image](https://hub.docker.com/r/ollama/ollama), or you can [download the binary to your operating system](https://ollama.com/download/). 
@@ -104,7 +111,17 @@ Ollama supports many different LLMs. Visit the [Ollama models page](https://olla
 
 For this example, we will use [Meta's llama 3](https://llama.meta.com/llama3/).
 
-Run these commands to get started.
+### Launch Ollama and PGVector Together Using Docker Compose
+We've taken care of Ollama for you by including it in the Docker Compose file. Run these commands to launch it and then install the llama3 LLM model.
+
+```shell
+. ./env.sh
+docker compose up -d
+docker exec -it ollama ollama run llama3
+```
+
+### Launch Ollama as a separate Docker Container
+If you choose to run Ollama outside of Docker Compose, follow these commands.
 
 ```Shell
 docker pull ollama/ollama
