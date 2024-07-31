@@ -1,7 +1,7 @@
 # Spring AI Lab
 #### https://github.com/ByteworksHomeLab/spring-ai-lab
-This project is an introduction to Spring AI. It demonstrates running two LLMs, Llama 3 on the Ollama platform and OpenAI, using a combination of Maven profiles and Spring 
-profiles to switch back and forth.
+This project is an introduction to Spring AI. It demonstrates running three LLMs with Spring AI: Llama 3 on the Ollama platform, plus Groq and OpenAI in the Cloud. We use a combination of Maven profiles and Spring 
+profiles to switch between the LLMs without having to change any Java code.
 
 The project relies on Docker for simplicity.
 
@@ -25,7 +25,9 @@ You probably see a trend here. As a Spring Developer, you may be asked to add AI
 language model with proprietary company data. These are the situations where Spring AI can help.
 
 ## Getting Started
-The purpose of this project is to dip your toes into the AI waters, and you'll need realistic expectations about performance.
+The purpose of this project is to dip your toes into the AI waters. We'll demonstrate using Spring AI calling OpenAI and Groq via the respective APIs, so you'll API keys for both.
+Also, we'll install Ollama to run the Llama3 LLM locally. Ollama is Like VirtualBox or Docker Desktop, but instead of running virtual machines or containers, it runs LLMs.
+One caveat is that you'll need realistic expectations about local LLM performance.
 
 ### What about GPUs?
 The good news is that you can do this lab without a GPU as long as you have patience. Performance is terrible on my 2019 Intel Macbook Pro, 
@@ -34,8 +36,8 @@ but AI response time is tolerable on my M1 MacBook Pro.
 [Meta's Lama 3 Requirements](https://llamaimodel.com/requirements/) say you can get by with an NVidia GeForce RTX 3000-series GPU, which has about 12 GB RAM. 
 This NLP Cloud's article [How to Install and Deploy LLaMA 3 Into Production?](https://nlpcloud.com/how-to-install-and-deploy-llama-3-into-production.html) recommends 20 GB RAM on the GPU, like an NVidia A10, for production use. 
 
-My 10-year-old home lab workstations didn't justify an expensive GPU, so I picked up an Nvidia GeForce 1080 for $120 on eBay, 
-and it performs great in my home lab.
+My 10-year-old home lab workstations didn't justify an expensive GPU, so I bought a used Nvidia GeForce 1080 for $120 on eBay, 
+and it performs great. My response time dropped from tens of seconds on my M1 MacBook Pro to close to one second on my Ubuntu workstation with the GeForce 1080.
 
 ## Preconditions
 
@@ -55,19 +57,17 @@ sdk use java 22.0.1-tem
 
 This project was built using Maven 3.9.8, but any recent version of Maven will be fine.
 
-
-
 ### 3) PostgreSQL
 
 PostgreSQL is used as the vector database for the project. Specifically, we are using the PGVector Docker image that includes vector database support.
-PGVector is defined in the `docker-compose.yaml` at the root of the project.
+PGVector is defined in the `docker-compose.yaml` file at the root of the project.
 
 ### 4) Ollama
 
 [Ollama](https://ollama.com) is an opensource platform for running LLMs locally. It makes it easier to get started with AI by hiding the complexities
-of running a LLM (Large Language Model). Choose between the [Ollama Docker image](https://hub.docker.com/r/ollama/ollama), or [download the binary to your operating system](https://ollama.com/download/).
+of running a LLM (Large Language Model). Choose between the [Ollama Docker image](https://hub.docker.com/r/ollama/ollama), or [downloading the binary to your operating system](https://ollama.com/download/).
 
-Ollama is defined in the `docker-compose.yaml` at the root of the project.
+Ollama is also defined in the `docker-compose.yaml` file at the root of the project.
 
 Ollama supports many different LLMs. Visit the [Ollama models page](https://ollama.com/library) for the list of supported LLMs, ranked by popularity.
 
@@ -80,23 +80,29 @@ For this example, we will use [Meta's llama 3.1:8b](https://ollama.com/library/l
 In addition to running LLM models locally, this project demonstrates connecting to the OpenAI API. For that, you'll need to create an OpenAI API Key. You can start with a free 
 OpenAI account. Later, when you bump up against rate limiting, you can upgrade to a pay-as-you-go account. 
 
-[Here is the link to create an OpenAI API key](https://platform.openai.com/settings/profile?tab=api-keys). Be sure to save the API Key somewhere safe when you create it. 
-We'll use it in an environment variable below.
+[Here is the link to create an OpenAI API key](https://platform.openai.com/settings/profile?tab=api-keys). Be sure to save the API Key somewhere safe when you create it.
 
-### 6) Set your environment variables.
+### 6) Groq
 
-You must first export the variables needed by the [docker-compose.yml](docker-compose.yml) and [application.yml](src%2Ftest%2Fresources%2Fapplication.yml) files.
+This project demonstrates connecting to the Groq API too. You'll need to create a Groq API Key. 
 
-It's more convenient to run the variable exports inside script file. Let's assume that you put the export statements in a file named `env.sh` at the root of the project, like this:
+[Here is the link to create a Groq API key](https://console.Groq.com/keys). Be sure to save the API Key.
+
+### 7) Set your environment variables.
+
+You need to export variables into your terminal or IDE runtime environment. The [docker-compose.yml](docker-compose.yml) and [application.yml](src%2Ftest%2Fresources%2Fapplication.yml) files both need environment variables to be set.
+
+It's more convenient to run the variable exports inside a script file. Let's assume that you put the export statements in a file named `env.sh` at the root of the project, like this:
 
 ```shell
 #!/bin/bash
 export DB_USER=my-postgres-username
 export DB_PASSWORD=my-postgres-password
 export OPENAI_API_KEY=my-openai-api-key
+export Groq_API_KEY=my-grok-api-key
 ```
 
-Use any credentials you want for Postgres, plus your OpenAI API key created above. Use the ". ./path" syntax to on Mac or Linux to add the environment variables to the terminal session, as shown here:
+Use any credentials you want for Postgres, plus the Groq and OpenAI API keys created above. The `gitignore` file already contains and entry for a file named `.env.sh.` Use the ". ./path" syntax on Mac or Linux to add the environment variables to the terminal session, as shown here:
 
 ```shell
 . ./env.sh
@@ -107,7 +113,7 @@ configuration for the JUnit tests in Intellij. Do the same thing for Application
 ![IntelliJ Runtime](src/main/resources/static/intellij-runtime.png)
 
 ### Launch Ollama and PGVector Together Using Docker Compose for the First Time
-Now, you are ready to try out the `Docker Compose` file. Normally, Spring Boot `spring-boot-docker-compose` starts Docker Compose automatically, but we want to do some housekeeping first.
+Now you are ready to try out the `Docker Compose` file. Normally, running Spring Boot starts Docker Compose automatically because of the `spring-boot-docker-compose` library, but we want to do some housekeeping first.
 
 Start `Docker Compose` from the root of the project as shown:
 
@@ -148,7 +154,7 @@ and engaging responses. I can generate text on a wide range of topics, from scie
 >>>/bye
 ```
 
-To demonstrate that Spring Boot `spring-boot-docker-compose` automatically starts Docker Compose next time, from the root directory of the project, shutdown Docker Compose like this:
+Shutdown Docker Compose so you can demonstrate that Spring Boot `spring-boot-docker-compose` automatically starts Docker Compose. From the root directory of the project, do this:
 
 ```shell
 docker compose down
@@ -185,6 +191,13 @@ If you want to use OpenAI, then you must set the Maven profile to "openapi" and 
 ```shell
 . ./env.sh
 mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=gpt-4o"
+```
+
+If you want to use Groq, then you must set the Maven profile to "openapi" and Spring profile to "groq."
+
+```shell
+. ./env.sh
+mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=groq"
 ```
 
 ## Spring AI

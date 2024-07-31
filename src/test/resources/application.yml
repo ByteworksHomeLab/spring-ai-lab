@@ -40,7 +40,20 @@ spring:
       chat:
         options:
           model: gpt-4o
-
+          temperature: 0.7
+---
+spring:
+  config:
+    activate:
+      on-profile: "groq"
+  ai:
+    openai:
+      api-key: ${GROQ_API_KEY}
+      chat:
+        options:
+          model: llama3-70b-8192
+          temperature: 0.7
+      base-url: https://api.groq.com/openai
 etl:
   airbnbLoadListings: false
   clearAirbnbListingsTable: false
