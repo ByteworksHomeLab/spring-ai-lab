@@ -13,11 +13,6 @@ spring:
         index-type: HNSW
         distance-type: COSINE_DISTANCE
         initialize-schema: true
-  datasource:
-    url: jdbc:postgresql://localhost:5432/airbnb_test
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
 management:
   endpoints:
     web:

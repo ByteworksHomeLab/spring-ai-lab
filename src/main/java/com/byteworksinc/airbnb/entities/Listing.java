@@ -1,8 +1,9 @@
 package com.byteworksinc.airbnb.entities;
 
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
-import jakarta.validation.constraints.NotEmpty;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
