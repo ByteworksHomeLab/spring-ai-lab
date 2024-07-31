@@ -102,7 +102,7 @@ export OPENAI_API_KEY=my-openai-api-key
 export Groq_API_KEY=my-grok-api-key
 ```
 
-Use any credentials you want for Postgres, plus the Groq and OpenAI API keys created above. The `gitignore` file already contains and entry for a file named `.env.sh.` Use the ". ./path" syntax on Mac or Linux to add the environment variables to the terminal session, as shown here:
+Use any credentials you want for Postgres, plus the Groq and OpenAI API keys created above. The `gitignore` file already contains and entry for a file named `env.sh.` Use the ". ./path" syntax on Mac or Linux to add the environment variables to the terminal session, as shown here:
 
 ```shell
 . ./env.sh
@@ -154,7 +154,7 @@ and engaging responses. I can generate text on a wide range of topics, from scie
 >>>/bye
 ```
 
-Shutdown Docker Compose so you can demonstrate that Spring Boot `spring-boot-docker-compose` automatically starts Docker Compose. From the root directory of the project, do this:
+Shutdown Docker Compose, so you can demonstrate that the Spring Boot `spring-boot-docker-compose` library automatically starts Docker Compose. From the root directory of the project, do this:
 
 ```shell
 docker compose down
@@ -176,8 +176,6 @@ mvn clean test
 
 Spring Boot also needs the environment variables exported to in the terminal or added to your IDE's runtime configuration. Once the environment variables are exported, `spring-boot-docker-compose` automatically brings up Docker Compose whenever Spring Boot is run.
 
-![spring-boot-run-docker-compose.png](src%2Fmain%2Fresources%2Fstatic%2Fspring-boot-run-docker-compose.png)
-
 The default Maven profile is "ollama," and the default Spring profile is "llama3," so if that is all you need, then a simple `mvn spring-boot:run` 
 will suffice.
 
@@ -185,6 +183,9 @@ will suffice.
 . ./env.sh
 mvn spring-boot:run 
 ```
+The output should look like this:
+
+![spring-boot-run-docker-compose.png](src%2Fmain%2Fresources%2Fstatic%2Fspring-boot-run-docker-compose.png)
 
 If you want to use OpenAI, then you must set the Maven profile to "openapi" and Spring profile to "gpt-4o."
 
@@ -239,6 +240,38 @@ spring:
 
 This project uses Spring profiles to control which properties are loaded. It also uses Maven profiles in the [pom.xml](pom.xml) file to control which dependencies are loaded.
 
+Next, define a Spring Bean for the Spring AI ChatClient. I put mine in my configuration class along with the Spring property placeholder.
+
+```shell
+@Configuration
+@PropertySource("classpath:application.yml")
+class Config {
+    @Bean
+    ChatClient chatClient(ChatClient.Builder builder) {
+        return builder.build();
+    }
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
+}
+```
+
+Finally, add a REST endpoint that calls the autowired `chatClient.`
+
+```shell
+    @GetMapping("/")
+    public String joke(@RequestParam(value = "message", defaultValue = "Tell me a dad joke") String message) {
+        return this.chatClient.prompt()
+                .user(message)
+                .call()
+                .content(); // short for getResult().getOutput().getContent();
+    }
+```
+
+You should now have a functional REST API that makes calls to OpenAPI ChatGPT 4.o.
 
 
 
