@@ -10,6 +10,8 @@ The project relies on Docker for simplicity.
 JUnit tests use Docker Test Containers to dynamically spin up Postgres PGVector. The Spring Boot AI application spins up Docker Compose automatically when it runs providing both Ollama and Postgres PGVector. 
 The only thing not automated is the installation of the Llama3 LLM, but that is a one-time task (unless the Docker volume gets deleted).
 
+__At the end of this README file, you'll learn how to get up and running with OpenAI in less than 15 minutes__.
+
 ## Audience
 The audience or this project is Spring Framework application developers who are new to artificial intelligence. It is expected that you know your way around the Spring Framework, 
 but we don't assume any AI experience.
@@ -25,7 +27,7 @@ You probably see a trend here. As a Spring Developer, you may be asked to add AI
 language model with proprietary company data. These are the situations where Spring AI can help.
 
 ## Getting Started
-The purpose of this project is to dip your toes into the AI waters. We'll demonstrate using Spring AI calling OpenAI and Groq via the respective APIs, so you'll API keys for both.
+The purpose of this project is to dip your toes into the AI waters. We'll demonstrate using Spring AI calling OpenAI and Groq via their respective APIs, so you'll need to sign up for free API keys from both.
 Also, we'll install Ollama to run the Llama3 LLM locally. Ollama is Like VirtualBox or Docker Desktop, but instead of running virtual machines or containers, it runs LLMs.
 One caveat is that you'll need realistic expectations about local LLM performance.
 
@@ -37,7 +39,7 @@ but AI response time is tolerable on my M1 MacBook Pro.
 This NLP Cloud's article [How to Install and Deploy LLaMA 3 Into Production?](https://nlpcloud.com/how-to-install-and-deploy-llama-3-into-production.html) recommends 20 GB RAM on the GPU, like an NVidia A10, for production use. 
 
 My 10-year-old home lab workstations didn't justify an expensive GPU, so I bought a used Nvidia GeForce 1080 for $120 on eBay, 
-and it performs great. My response time dropped from tens of seconds on my M1 MacBook Pro to close to one second on my Ubuntu workstation with the GeForce 1080.
+and it performs great! My response time dropped from tens of seconds on my M1 MacBook Pro to close to one second on my Ubuntu workstation with the GeForce 1080.
 
 ## Preconditions
 
@@ -201,59 +203,38 @@ If you want to use Groq, then you must set the Maven profile to "openapi" and Sp
 mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=groq"
 ```
 
-## Spring AI
-Okay, now that you know how to run everything in this [GitHub project](https://github.com/ByteworksHomeLab/spring-ai-lab), it's your turn to set up your own Spring AI project.
+# Build your own Spring AI Project
+Okay, now that you know how to run everything in this [GitHub project](https://github.com/ByteworksHomeLab/spring-ai-lab), it's your turn to set up your own Spring AI project. This will take less than 15 minutes.
 
-### Spring AI Library
-Use [Spring Initializr](https://start.spring.io) to create a project with the dependencies shown below:
+## Spring AI Library
+Use [Spring Initializr](https://start.spring.io) to create a project with the dependencies shown below. To keep it simple, we'll start with just OpenAPI and Spring Web.
 
-![start.spring-io.jpeg](src/main/resources/static/start.spring-io.jpeg)
+![start-spring-io.png](src%2Fmain%2Fresources%2Fstatic%2Fstart-spring-io.png)
 
-### Set up the Application Properties
+## Set up the Application Properties
 
-A full [application.yml](src%2Fmain%2Fresources%2Fapplication.yml) file is included in this project. A bare-bones properties file for Ollama might look like this.
-
-```yaml
-spring:
-  application:
-    name: spring-ai-airbnb
-  ai:
-    ollama:
-      base-url: http://localhost:11434
-      chat:
-        model: llama3.1:8b
-```
-
-Here is a bare-bones properties file for Ollama3.
+Paste these bare-bones properties file for ChatGPT into the `application.yml` file.
 
 ```yaml
 spring:
   application:
-    name: spring-ai-airbnb
+    name: demo
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY}
+      api-key: YOUR_OPENAI_API_KEY_HERE
       chat:
         options:
           model: gpt-4o
 ```
 
-This project uses Spring profiles to control which properties are loaded. It also uses Maven profiles in the [pom.xml](pom.xml) file to control which dependencies are loaded.
-
-Next, define a Spring Bean for the Spring AI ChatClient. I put mine in my configuration class along with the Spring property placeholder.
+Next, define a Spring Bean for the Spring AI ChatClient.
 
 ```shell
 @Configuration
-@PropertySource("classpath:application.yml")
-class Config {
+public class Config {
     @Bean
     ChatClient chatClient(ChatClient.Builder builder) {
         return builder.build();
-    }
-
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
     }
 
 }
@@ -262,16 +243,32 @@ class Config {
 Finally, add a REST endpoint that calls the autowired `chatClient.`
 
 ```shell
+@RestController
+public class ChatController {
+
+    private final ChatClient chatClient;
+
+    public ChatController(final ChatClient chatClient) {
+        this.chatClient = chatClient;
+    }
+
     @GetMapping("/")
-    public String joke(@RequestParam(value = "message", defaultValue = "Tell me a dad joke") String message) {
+    public String simplePrompt(@RequestParam(value = "message", defaultValue = "Tell me a dad joke") String message) {
         return this.chatClient.prompt()
                 .user(message)
                 .call()
                 .content(); // short for getResult().getOutput().getContent();
     }
+
+}
 ```
 
-You should now have a functional REST API that makes calls to OpenAPI ChatGPT 4.o.
+That is all you need to get started. Make sure the unit test runs, then start the project and use ChatGPT.
+
+1) Run `mvn spring-boot:run`.
+2) Open http://localhost:8080?message=You are a Spring Developer Advocate. Tell me about Spring AI. Use HTML for the response.
+
+Next, take a look at this project and experiment with other features like Ollama and a vector database. Have fun!
 
 
 
