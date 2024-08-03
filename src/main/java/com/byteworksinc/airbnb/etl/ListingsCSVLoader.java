@@ -2,12 +2,14 @@ package com.byteworksinc.airbnb.etl;
 
 import com.byteworksinc.airbnb.dao.ListingRepository;
 import com.byteworksinc.airbnb.entities.Listing;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -22,12 +24,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-@Slf4j
 @Component
-public class ListingsEtl implements CommandLineRunner {
+public class ListingsCSVLoader implements CommandLineRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(ListingsCSVLoader.class);
     private final ListingRepository listingRepository;
     private final boolean loadListings;
     private final boolean clearListingsTable;
+    @Value("classpath:/data/listings.csv")
+    private Resource listingsCSVResource;
 
     private final String[] headers = {"id", "listing_url", "scrape_id", "last_scraped", "source", "name", "description",
             "neighborhood_overview", "picture_url", "host_id", "host_url", "host_name", "host_since", "host_location",
@@ -44,7 +49,7 @@ public class ListingsEtl implements CommandLineRunner {
             "instant_bookable", "calculated_host_listings_count", "calculated_host_listings_count_entire_homes",
             "calculated_host_listings_count_private_rooms", "calculated_host_listings_count_shared_rooms", "reviews_per_month"};
 
-    public ListingsEtl(final ListingRepository listingRepository, @Value("${airbnbLoadListings}") final boolean loadListings, @Value("${clearAirbnbListingsTable}") final boolean clearListingsTable) {
+    public ListingsCSVLoader(final ListingRepository listingRepository, @Value("${airbnbLoadListings}") final boolean loadListings, @Value("${clearAirbnbListingsTable}") final boolean clearListingsTable) {
         this.listingRepository = listingRepository;
         this.loadListings = loadListings;
         this.clearListingsTable = clearListingsTable;
@@ -52,7 +57,7 @@ public class ListingsEtl implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        log.info(String.format("ListingsETL is starting. Listing records is %s", listingRepository.count()));
+        log.info("ListingsETL is starting. Listing records is {}", listingRepository.count());
         if (clearListingsTable) {
             log.info("ListingsETL is clearing the Listings table");
             listingRepository.deleteAll();
@@ -60,14 +65,14 @@ public class ListingsEtl implements CommandLineRunner {
         // This isn't testing listingRepository.count() because it slowed down the unit tests.
         if (loadListings && listingRepository.count() == 0) {
             log.info("ListingsETL is loading the Listings table");
-            readListingCsvFile("data/listings.csv");
+            readListingCsvFile();
         }
     }
 
-    public void readListingCsvFile(final String path) {
+    public void readListingCsvFile() {
         InputStream stream = null;
         try {
-            stream = new ClassPathResource(path).getInputStream();
+            stream = listingsCSVResource.getInputStream();
             readListingInputStream(stream);
         } catch (Exception e) {
             log.error("Error loading data", e);
@@ -170,11 +175,11 @@ public class ListingsEtl implements CommandLineRunner {
                     null
             );
             if (count % 500 == 0) {
-                log.info(String.format("Saving listing %s.", count));
+                log.info("Saving listing {}.", count);
             }
             listingRepository.save(listing);
         }
-        log.info(String.format("Wrote %s listings.", count));
+        log.info("Wrote {} listings.", count);
     }
 
     private Integer getInteger(CSVRecord record, String columnName) {
@@ -184,7 +189,7 @@ public class ListingsEtl implements CommandLineRunner {
                 try {
                     return Integer.parseInt(value);
                 } catch (NumberFormatException e) {
-                    log.warn(String.format("Could not parse Integer %s", value));
+                    log.warn("Could not parse Integer{}", value);
                 }
             }
         }
@@ -198,7 +203,7 @@ public class ListingsEtl implements CommandLineRunner {
                 try {
                     return Long.parseLong(value);
                 } catch (NumberFormatException e) {
-                    log.warn(String.format("Could not parse Float %s", value));
+                    log.warn("Could not parse Float {}", value);
                 }
             }
         }
@@ -212,7 +217,7 @@ public class ListingsEtl implements CommandLineRunner {
                 try {
                     return Boolean.parseBoolean(value);
                 } catch (NumberFormatException e) {
-                    log.warn(String.format("Could not parse Boolean %s", value));
+                    log.warn("Could not parse Boolean {}", value);
                 }
             }
         }
@@ -230,7 +235,7 @@ public class ListingsEtl implements CommandLineRunner {
                     }
                     return rawValue;
                 } catch (NumberFormatException e) {
-                    log.warn(String.format("Could not parse Float %s", value));
+                    log.warn("Could not parse Float {}", value);
                 }
             }
         }
@@ -244,7 +249,7 @@ public class ListingsEtl implements CommandLineRunner {
                 try {
                     return Double.parseDouble(value);
                 } catch (NumberFormatException e) {
-                    log.warn(String.format("Could not parse Double %s", value));
+                    log.warn("Could not parse Double {}", value);
                 }
             }
         }
@@ -259,7 +264,7 @@ public class ListingsEtl implements CommandLineRunner {
                     double d = Double.parseDouble(value);
                     return BigDecimal.valueOf(d).setScale(scale, RoundingMode.HALF_UP);
                 } catch (NumberFormatException e) {
-                    log.warn(String.format("Could not parse BigDecimal %s", value));
+                    log.warn("Could not parse BigDecimal {}", value);
                 }
             }
         }
@@ -272,7 +277,7 @@ public class ListingsEtl implements CommandLineRunner {
             try {
                 return formatter.parse(value);
             } catch (ParseException e) {
-                log.warn(String.format("Could not parse date %s", value));
+                log.warn("Could not parse date {}", value);
             }
         }
         return null;

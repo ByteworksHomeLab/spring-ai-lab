@@ -257,7 +257,7 @@ public class ChatController {
         return this.chatClient.prompt()
                 .user(message)
                 .call()
-                .content(); // short for getResult().getOutput().getContent();
+                .content(); 
     }
 
 }
