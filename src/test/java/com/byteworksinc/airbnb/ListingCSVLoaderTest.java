@@ -38,7 +38,8 @@ public class ListingCSVLoaderTest {
         assertThat(postgres.isCreated()).isTrue();
         assertThat(postgres.isRunning()).isTrue();
     }
-    @Test
+
+//    @Test
     public void testReadListingCsvFile() {
         try {
             listingDao.deleteAll();

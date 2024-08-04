@@ -3,17 +3,17 @@ spring:
     default: llama3
   application:
     name: spring-ai-airbnb
-  ai:
-    vectorstore:
-      pgvector:
-        dimensions: 1536
-        index-type: HNSW
-        distance-type: COSINE_DISTANCE
   datasource:
     url: jdbc:postgresql://localhost:5432/airbnb
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+  ai:
+    vectorstore:
+      pgvector:
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 384
   sql:
     init:
       mode: always
@@ -32,11 +32,9 @@ spring:
       base-url: http://localhost:11434
       chat:
         model: llama3.1:8b
-        options:
-          temperature: 0.7
       embedding:
         enabled: true
-        model: OllamaEmbeddingModel
+        model: all-minilm
 ---
 spring:
   config:
@@ -49,6 +47,7 @@ spring:
         options:
           model: gpt-4o
           temperature: 0.7
+
 ---
 spring:
   config:

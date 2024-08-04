@@ -8,9 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +21,9 @@ import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 @Component
@@ -30,7 +32,10 @@ public class ListingsCSVLoader implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(ListingsCSVLoader.class);
     private final ListingRepository listingRepository;
     private final boolean loadListings;
+
+    private final ListingEmbedder listingEmbedder;
     private final boolean clearListingsTable;
+
     @Value("classpath:/data/listings.csv")
     private Resource listingsCSVResource;
 
@@ -49,8 +54,14 @@ public class ListingsCSVLoader implements CommandLineRunner {
             "instant_bookable", "calculated_host_listings_count", "calculated_host_listings_count_entire_homes",
             "calculated_host_listings_count_private_rooms", "calculated_host_listings_count_shared_rooms", "reviews_per_month"};
 
-    public ListingsCSVLoader(final ListingRepository listingRepository, @Value("${airbnbLoadListings}") final boolean loadListings, @Value("${clearAirbnbListingsTable}") final boolean clearListingsTable) {
+    public ListingsCSVLoader(final ListingRepository listingRepository,
+                             final ListingEmbedder listingEmbedder,
+                             @Value("${airbnbLoadListings}")
+                             final boolean loadListings,
+                             @Value("${clearAirbnbListingsTable}")
+                             final boolean clearListingsTable) {
         this.listingRepository = listingRepository;
+        this.listingEmbedder = listingEmbedder;
         this.loadListings = loadListings;
         this.clearListingsTable = clearListingsTable;
     }
@@ -87,7 +98,7 @@ public class ListingsCSVLoader implements CommandLineRunner {
         }
     }
 
-    private void readListingInputStream(InputStream input) throws Exception {
+    public void readListingInputStream(InputStream input) throws Exception {
         int count = 0;
         Listing listing;
         Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8);
@@ -95,8 +106,10 @@ public class ListingsCSVLoader implements CommandLineRunner {
                 .withHeader(headers)
                 .withFirstRecordAsHeader()
                 .parse(reader);
+        List<Listing> listings = new ArrayList<>();
         for (CSVRecord record : records) {
             count += 1;
+
             listing = new Listing(
                     getLong(record, "id"),
                     record.get("listing_url"),
@@ -174,12 +187,30 @@ public class ListingsCSVLoader implements CommandLineRunner {
                     getBigDecimal(record, "reviews_per_month", 2),
                     null
             );
-            if (count % 500 == 0) {
+            listings.add(listing);
+            if (count % 250 == 0) {
                 log.info("Saving listing {}.", count);
+                saveListings(listings);
+                listings.clear();
             }
-            listingRepository.save(listing);
+
+
         }
+        saveListings(listings);
         log.info("Wrote {} listings.", count);
+    }
+
+    public void saveListings(List<Listing> listings) {
+        if (listings != null && !listings.isEmpty()) {
+            listingRepository.saveAll(listings);
+            for (Listing aListing: listings) {
+                try {
+                    listingEmbedder.embedListing(aListing);
+                } catch (RuntimeException e) {
+                    log.warn("Error saving embedding {}", e.getMessage()  );
+                }
+            }
+        }
     }
 
     private Integer getInteger(CSVRecord record, String columnName) {

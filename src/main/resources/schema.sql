@@ -1,5 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS vector;
-CREATE TABLE IF NOT EXISTS listing
+
+CREATE TABLE IF NOT EXISTS public.listing
 (
     id                                           BIGINT        NOT NULL,
     listing_url                                  TEXT,
@@ -8,6 +9,7 @@ CREATE TABLE IF NOT EXISTS listing
     source                                       TEXT,
     name                                         TEXT,
     description                                  TEXT,
+    description_embedding                        VECTOR(1536),
     neighborhood_overview                        TEXT,
     picture_url                                  TEXT,
     host_id                                      BIGINT        NOT NULL,
@@ -86,15 +88,14 @@ CREATE TABLE IF NOT EXISTS listing
     CONSTRAINT "PKListing_01" PRIMARY KEY ("id")
 );
 
-CREATE INDEX  IF NOT EXISTS "IDXAirbnb_02"
-    on listing (host_id);
+CREATE INDEX IF NOT EXISTS "IDXAirbnb_02"
+    on public.listing (host_id);
 
 CREATE INDEX IF NOT EXISTS "IDXAirbnb_03"
-    on listing (property_type);
+    on public.listing (property_type);
 
 CREATE INDEX IF NOT EXISTS "IDXAirbnb_04"
-    on listing (room_type);
+    on public.listing (room_type);
 
 CREATE INDEX IF NOT EXISTS "IDXAirbnb_05"
-    on listing (bedrooms);
-
+    on public.listing (bedrooms);

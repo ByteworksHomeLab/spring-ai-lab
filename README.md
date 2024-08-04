@@ -156,6 +156,60 @@ and engaging responses. I can generate text on a wide range of topics, from scie
 >>>/bye
 ```
 
+You also need to pull the embedding model, `all-minilm.` Ollama supports [three embedding models](https://ollama.com/blog/embedding-models).
+
+| Embedding Model                                                   | Parameters   |
+|-------------------------------------------------------------------|--------------|
+| [mxbai-embed-large](https://ollama.com/library/mxbai-embed-large) | 334M         |
+| [nomic-embed-text](https://ollama.com/library/nomic-embed-text)   | 137M         |
+| [all-minilm](https://ollama.com/library/all-minilm)               | 23M          |
+
+Use the `ollama pull` command to pull down the embedding model.
+
+```shell
+docker exec -it ollama ollama pull all-minilm
+```
+
+In addition, you must match the Vector Store to the embedding model dimensions.
+
+```sql
+CREATE TABLE IF NOT EXISTS public.vector_store
+(
+    id        uuid default uuid_generate_v4() not null
+        primary key,
+    content   text,
+    metadata  json,
+    embedding vector(384)
+);
+```
+
+Or alter the embedding column.
+
+```sql
+ALTER TABLE public.vector_store
+    ALTER COLUMN embedding TYPE vector(384);
+```
+
+Finally, make sure the embedding model and embedding type are part of the application properties.
+
+```yaml
+spring:
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: llama3.1:8b
+      embedding:
+        enabled: true
+        model: all-minilm
+    vectorstore:
+      pgvector:
+        index-type: hnsw
+        dimensions: 384
+        distance-type: cosine_distance
+```
+
 Shutdown Docker Compose, so you can demonstrate that the Spring Boot `spring-boot-docker-compose` library automatically starts Docker Compose. From the root directory of the project, do this:
 
 ```shell

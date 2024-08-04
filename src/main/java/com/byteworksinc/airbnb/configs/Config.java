@@ -1,6 +1,7 @@
 package com.byteworksinc.airbnb.configs;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -17,6 +18,11 @@ class Config {
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    TokenTextSplitter tokenTextSplitter() {
+        return new TokenTextSplitter();
     }
 
 }

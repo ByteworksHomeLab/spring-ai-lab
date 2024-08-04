@@ -4,56 +4,11 @@ spring:
       mode: always
   application:
     name: spring-ai-airbnb-test
-  profiles:
-    default: llama3
-  ai:
-    vectorstore:
-      pgvector:
-        dimensions: 1536
-        index-type: HNSW
-        distance-type: COSINE_DISTANCE
-        initialize-schema: true
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
----
-spring:
-  config:
-    activate:
-      on-profile: "llama3"
-  ai:
-    ollama:
-      base-url: http://10.0.0.7:11434
-      chat:
-        options:
-          model: llama3.1:8b
----
-spring:
-  config:
-    activate:
-      on-profile: "gpt-4o"
-  ai:
-    openai:
-      api-key: ${OPENAI_API_KEY}
-      chat:
-        options:
-          model: gpt-4o
-          temperature: 0.7
----
-spring:
-  config:
-    activate:
-      on-profile: "groq"
-  ai:
-    openai:
-      api-key: ${GROQ_API_KEY}
-      chat:
-        options:
-          model: llama3-70b-8192
-          temperature: 0.7
-      base-url: https://api.groq.com/openai
+  datasource:
+    url: jdbc:postgresql://localhost:5432/airbnb
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
 etl:
   airbnbLoadListings: false
   clearAirbnbListingsTable: false
