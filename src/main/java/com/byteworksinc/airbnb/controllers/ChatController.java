@@ -1,7 +1,6 @@
 package com.byteworksinc.airbnb.controllers;
 
 
-import com.byteworksinc.airbnb.etl.ListingEmbedder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -20,6 +19,12 @@ public class ChatController {
 
     private static final Logger log = LoggerFactory.getLogger(ChatController.class);
 
+    private static final String systemPrompt = """
+            You are a comedian:
+            1) Great the user
+            2) Tell them a joke
+            3) Ask the user if they would like to ear another joke.
+            """;
 
     private final ChatClient chatClient;
 
@@ -30,67 +35,17 @@ public class ChatController {
     /**
      * A basic example of how to use the chat client to pass a message and call the LLM
      *
-     * @param message
-     * @return
+     * @param message - Describe the type of joke you want to hear.
+     * @return A joke
      */
     @GetMapping("/")
-    public String joke(@RequestParam(value = "message", defaultValue = "Tell me a dad joke") String message) {
+    public String prompt(@RequestParam(value = "message", defaultValue = "Tell me a dad joke") String message) {
+        log.info("prompt() <- {}", message);
         return this.chatClient.prompt()
+                .system(systemPrompt)
                 .user(message)
                 .call()
                 .content(); // short for getResult().getOutput().getContent();
-    }
-
-    /**
-     * Take in a topic as a request parameter and use that param in the user message
-     *
-     * @param topic
-     * @return
-     */
-    @GetMapping("/jokes-by-topic")
-    public String jokesByTopic(@RequestParam(value = "topic", defaultValue = "animals") String topic) {
-        return chatClient.prompt()
-                .user(u -> u.text("Tell me a joke about {topic}").param("topic", topic))
-                .call()
-                .content();
-    }
-
-    /**
-     * What if you didn't want to get a String back, and you wanted the whole response?
-     *
-     * @param message
-     * @return
-     */
-    @GetMapping("jokes-with-response")
-    public ChatResponse jokeWithResponse(@RequestParam(value = "message", defaultValue = "Tell me a dad joke about computers") String message) {
-        return chatClient.prompt()
-                .user(message)
-                .call()
-                .chatResponse();
-    }
-
-    @GetMapping("jokes-by-pete")
-    public ChatResponse jokesByPete(
-            @RequestParam(value = "name", defaultValue = "friend") String name,
-            @RequestParam(value = "adjective", defaultValue = "dad") String adjective,
-            @RequestParam(value = "topic", defaultValue = "animals") String topic
-    ) {
-        String userText = "My name is {name}. Tell me a {adjective}  joke about {topic}.";
-        PromptTemplate userPromptTemplate = new PromptTemplate(userText);
-        Message userMessage = userPromptTemplate.createMessage(Map.of("name", name, "adjective", adjective, "topic", topic));
-        String systemText = """
-                  You're a comedian named {name}.
-                  First, greet the user by name, introduce yourself, then reply to the user's request.
-                  Finish by thanking the user for asking for a joke.
-                """;
-        SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(systemText);
-        Message systemMessage = systemPromptTemplate.createMessage(Map.of("name", "Alexa"));
-        System.out.println(systemMessage.getContent());
-        return chatClient.prompt()
-                .user(userMessage.getContent())
-                .system(systemMessage.getContent())
-                .call()
-                .chatResponse();
     }
 
 }

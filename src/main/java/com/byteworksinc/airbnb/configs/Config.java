@@ -1,6 +1,7 @@
 package com.byteworksinc.airbnb.configs;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +12,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @PropertySource("classpath:application.yml")
 class Config {
     @Bean
-    ChatClient chatClient(ChatClient.Builder builder) {
+    public ChatClient chatClient(ChatClient.Builder builder) {
         return builder.build();
     }
 

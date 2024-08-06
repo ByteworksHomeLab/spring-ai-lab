@@ -1,14 +1,22 @@
 spring:
-  sql:
-    init:
-      mode: always
   application:
-    name: spring-ai-airbnb-test
+    name: spring-ai-airbnb
   datasource:
     url: jdbc:postgresql://localhost:5432/airbnb
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: llama3.1:8b
+      embedding:
+        enabled: true
+        model: all-minilm
 etl:
   airbnbLoadListings: false
   clearAirbnbListingsTable: false

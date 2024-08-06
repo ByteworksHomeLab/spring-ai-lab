@@ -7,6 +7,8 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
@@ -33,22 +35,28 @@ public class ListingEmbedder {
         return valueString;
     }
 
-    public void embedListing(final Listing listing) {
-        log.debug("Embedding {} - {}", listing.id(), listing.name());
-        var document = new Document(
-                listing.name() + " " + listing.description(),
-                Map.of("id", listing.id(),
-                        "name", listing.name(),
-                        "description", listing.description(),
-                        "listingUrl", listing.listingUrl(),
-                        "price", listing.price(),
-                        "propertyType", listing.propertyType(),
-                        "neighborhood", listing.neighbourhood(),
-                        "bedrooms", asString(listing.bedrooms()),
-                        "bathrooms", asString(listing.bathrooms())
-                ));
-        var split = this.tokenTextSplitter
-                .apply(List.of(document));
-        vectorStore.add(split);
+    public void embedListing(final List<Listing> listings) {
+        listings.parallelStream().forEach(listing -> {
+            var document = new Document(
+                    listing.name() + ": " + listing.description(),
+                    Map.of("id", listing.id(),
+                            "name", listing.name(),
+                            "description", listing.description(),
+                            "listingUrl", listing.listingUrl(),
+                            "price", listing.price(),
+                            "propertyType", listing.propertyType(),
+                            "neighborhood", listing.neighbourhood(),
+                            "bedrooms", asString(listing.bedrooms()),
+                            "bathrooms", asString(listing.bathrooms())
+                    ));
+            try {
+                var split = this.tokenTextSplitter
+                        .apply(List.of(document));
+                vectorStore.add(split);
+            } catch (RuntimeException e) {
+                String message = String.format("Could not embed listing %s because %s", listing.id(), e.getMessage());
+                log.error(message, e);
+            }
+        });
     }
 }

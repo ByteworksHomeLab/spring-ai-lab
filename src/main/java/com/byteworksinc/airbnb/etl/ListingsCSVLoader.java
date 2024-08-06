@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -203,13 +202,7 @@ public class ListingsCSVLoader implements CommandLineRunner {
     public void saveListings(List<Listing> listings) {
         if (listings != null && !listings.isEmpty()) {
             listingRepository.saveAll(listings);
-            for (Listing aListing: listings) {
-                try {
-                    listingEmbedder.embedListing(aListing);
-                } catch (RuntimeException e) {
-                    log.warn("Error saving embedding {}", e.getMessage()  );
-                }
-            }
+            listingEmbedder.embedListing(listings);
         }
     }
 
