@@ -19,13 +19,6 @@ public class ChatController {
 
     private static final Logger log = LoggerFactory.getLogger(ChatController.class);
 
-    private static final String systemPrompt = """
-            You are a comedian:
-            1) Great the user
-            2) Tell them a joke
-            3) Ask the user if they would like to ear another joke.
-            """;
-
     private final ChatClient chatClient;
 
     public ChatController(final ChatClient chatClient) {
@@ -42,7 +35,6 @@ public class ChatController {
     public String prompt(@RequestParam(value = "message", defaultValue = "Tell me a dad joke") String message) {
         log.info("prompt() <- {}", message);
         return this.chatClient.prompt()
-                .system(systemPrompt)
                 .user(message)
                 .call()
                 .content(); // short for getResult().getOutput().getContent();
