@@ -18,5 +18,6 @@ spring:
         enabled: true
         model: all-minilm
 etl:
+  embedListings: false
   airbnbLoadListings: false
   clearAirbnbListingsTable: false

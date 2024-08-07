@@ -34,6 +34,7 @@ public class ListingsCSVLoader implements CommandLineRunner {
 
     private final ListingEmbedder listingEmbedder;
     private final boolean clearListingsTable;
+    private final boolean embedListings;
 
     @Value("classpath:/data/listings.csv")
     private Resource listingsCSVResource;
@@ -55,6 +56,8 @@ public class ListingsCSVLoader implements CommandLineRunner {
 
     public ListingsCSVLoader(final ListingRepository listingRepository,
                              final ListingEmbedder listingEmbedder,
+                             @Value("${embedListings}")
+                             final boolean embedListings,
                              @Value("${airbnbLoadListings}")
                              final boolean loadListings,
                              @Value("${clearAirbnbListingsTable}")
@@ -62,6 +65,7 @@ public class ListingsCSVLoader implements CommandLineRunner {
         this.listingRepository = listingRepository;
         this.listingEmbedder = listingEmbedder;
         this.loadListings = loadListings;
+        this.embedListings = embedListings;
         this.clearListingsTable = clearListingsTable;
     }
 
@@ -202,7 +206,9 @@ public class ListingsCSVLoader implements CommandLineRunner {
     public void saveListings(List<Listing> listings) {
         if (listings != null && !listings.isEmpty()) {
             listingRepository.saveAll(listings);
-            listingEmbedder.embedListing(listings);
+            if (embedListings) {
+                listingEmbedder.embedListing(listings);
+            }
         }
     }
 
