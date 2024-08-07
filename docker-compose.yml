@@ -32,7 +32,5 @@ volumes:
     driver: local
   ollama:
     driver: local
-  open-webui:
-    driver: local
 
 

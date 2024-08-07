@@ -1,17 +1,12 @@
 package com.byteworksinc.airbnb.controllers;
 
-import com.byteworksinc.airbnb.entities.Listing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,24 +27,26 @@ import java.util.Map;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @RestController
-public class SearchController {
+public class AirbnbController {
 
-    private static final Logger log = LoggerFactory.getLogger(SearchController.class);
+    private static final Logger log = LoggerFactory.getLogger(AirbnbController.class);
 
     private final VectorStore vectorStore;
     private static final SystemMessage systemMessage = new SystemMessage("""
-        - You are a travel agent that finds Airbnb listings for users. 
-        - If you do not know the answer, say you don't know.
-        - Return the top 3 results.
+        - You work for Airbnb.
+        - You help hosts write better descriptions for airbnb listings.
+        - Rewrite the user's Airbnb description using the information provided by the user in their prompt. DO NOT change the number of rooms or number of bathrooms.
+        - When rewriting the user's description consider similar descriptions from the LISTINGS section.
+        - Write the response using HTML.
     """);
 
-    private Resource listingsTemplateResource;
+    private final Resource listingsTemplateResource;
 
     private PromptTemplate  promptTemplate;
 
     private final ChatModel chatModel;
 
-    public SearchController(final ChatModel chatModel, final VectorStore vectorStore, @Value("classpath:/templates/listing.st") Resource listingsTemplateResource) {
+    public AirbnbController(final ChatModel chatModel, final VectorStore vectorStore, @Value("classpath:/templates/listing.st") Resource listingsTemplateResource) {
         this.chatModel = chatModel;
         this.vectorStore = vectorStore;
         this.listingsTemplateResource = listingsTemplateResource;
@@ -68,12 +64,18 @@ public class SearchController {
 
     }
 
+    /**
+     * If you aren't using a GPU, this method may take a couple of minutes to return the result.
+     * @param message e.g. http://localhost:8080/prompt-stuffing?message=2%20bedroom%2c2%20bath%2cclose%20to%20downtown%20austin
+     * @return - A generated description based on your input that is similar to listings returned from the vector database.
+     */
     @GetMapping("/prompt-stuffing")
-    public String promptStuffing(@RequestParam(value = "message", defaultValue = "What is the lowest price listing") String message) {
+    public String promptStuffing(@RequestParam String message) {
         log.info("promptStuffing() <- {}", message);
         List<Document> documents = this.vectorStore.similaritySearch(message);
         List<String> listings = new ArrayList<>();
         for (Document document: documents) {
+            log.info(document.getFormattedContent());
             listings.add(document.getContent());
         }
         log.info("promptStuffing() found {} similar results", documents.size());
