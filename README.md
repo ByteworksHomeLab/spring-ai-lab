@@ -11,7 +11,7 @@ Have a look at [Spring In Action](https://livebook.manning.com/book/spring-ai-in
 ## Overview
 
 This project is an introduction to Spring AI. It demonstrates running three LLMs (Large Language Models):
-- Llama 3.1 locally on the Ollama platform
+- Llama3 locally on the Ollama platform
 - Groq in the cloud
 - ChatGPT in the cloud
 
@@ -155,7 +155,28 @@ It should return the message: "Ollama is running."
 Next, install the LLama3 LLM using the `ollama` CLI installed on the Ollama Docker container.
 
 ```shell
+docker exec -it ollama ollama run llama3.1:8b
+```
+
+Install any other desired LLMs the same way.
+```shell
+docker exec -it ollama ollama run codegemma:2b
+```
+
+The first time you issue the Ollama `run` command it downloads and installs the LLM. Your terminal session may time out during the installation, but the LLM was probably successfully installed.
+Reconnect to the Ollama Docker container to rerun the `ollama run llama3.1:8b` command. The Ollama prompt should return quickly since the llama3 LLM is already installed. Try asking it a question.
+
+```shell
 docker exec -it ollama ollama run llama3
+
+>>> You are a newly installed LLM. Please tell me your version in six lines or less.
+I’m excited to share!
+My version is Meta AI’s LLaMA, the latest Large Language Model.
+I’m built on top of the Transformers library and trained on a massive dataset of text from the internet.
+My training data includes a wide range of texts, from books and articles to social media posts and more.
+I’ve been fine-tuned for conversational dialogue and can understand and respond to natural language inputs.
+I’m still learning and improving every day, but I’m ready to chat with you!
+>>> /bye
 ```
 
 These are commands for the Ollama CLI
@@ -211,7 +232,7 @@ spring:
       base-url: http://localhost:11434
       chat:
         options:
-          model: llama3
+          model: llama3.1:8b
       embedding:
         enabled: true
         model: all-minilm

@@ -20,7 +20,6 @@ public class ChatController {
     private static final Logger log = LoggerFactory.getLogger(ChatController.class);
 
     private final ChatClient chatClient;
-
     public ChatController(final ChatClient chatClient) {
         this.chatClient = chatClient;
     }
