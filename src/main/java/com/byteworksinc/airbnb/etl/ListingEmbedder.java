@@ -36,6 +36,7 @@ public class ListingEmbedder {
     }
 
     public void embedListing(final List<Listing> listings) {
+        log.info("Embedding listings");
         listings.parallelStream().forEach(listing -> {
             var document = new Document(
                     listing.name() + ": " + listing.description(),

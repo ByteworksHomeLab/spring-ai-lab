@@ -46,16 +46,8 @@ the Llama3 LLM locally. Ollama is Like VirtualBox or Docker Desktop, but instead
 it runs LLMs. One caveat is that you'll need realistic expectations about local LLM performance.
 
 ### What about GPUs?
-The good news is that you can do this lab without a GPU as long as you have patience. Performance is terrible on my 2019 
-Intel Macbook Pro, but AI response time is tolerable on my M1 MacBook Pro.
-
-[Meta's Lama 3 Requirements](https://llamaimodel.com/requirements/) say you can get by with an NVidia GeForce RTX 3000-series GPU, with 12 GB VRAM. 
-This NLP Cloud's article [How to Install and Deploy LLaMA 3 Into Production?](https://nlpcloud.com/how-to-install-and-deploy-llama-3-into-production.html) recommends 20 GB VRAM on the GPU, like 
-an NVidia A10, for production use. 
-
-My 10-year-old home lab workstations didn't justify an expensive GPU, so I bought a used Nvidia GeForce 1080 with 8 GB VRAM for $120 on 
-eBay, and it performs great! My response time dropped from tens of seconds on my M1 MacBook Pro to close to one second on 
-my Ubuntu workstation with the GeForce 1080.
+The good news is that you can do this lab without a GPU as long as you have patience, although, for longer term use you'll want a GPU. 
+Ollama support Nvidia and AMD GPUs. See the [Ollama GPU Documentation page](https://github.com/ollama/ollama/blob/main/docs/gpu.md).
 
 ## Preconditions
 
@@ -89,7 +81,7 @@ Ollama is also defined in the `docker-compose.yaml` file at the root of the proj
 
 Ollama supports many different LLMs. Visit the [Ollama models page](https://ollama.com/library) for the list of supported LLMs, ranked by popularity.
 
-For this example, we will use [Meta's llama 3.1:8b](https://ollama.com/library/llama3.1). 
+For this example, we will use [Meta's llama 3.1](https://ollama.com/library/llama3). 
 
 ### 5) OpenAI
 
@@ -117,6 +109,8 @@ at the root of the project, like this:
 #!/bin/bash
 export DB_USER=my-postgres-username
 export DB_PASSWORD=my-postgres-password
+export DB_HOST=localhost
+export DATABASE_NAME=airbnb
 export OPENAI_API_KEY=my-openai-api-key
 export Groq_API_KEY=my-grok-api-key
 ```
@@ -161,24 +155,23 @@ It should return the message: "Ollama is running."
 Next, install the LLama3 LLM using the `ollama` CLI installed on the Ollama Docker container.
 
 ```shell
-docker exec -it ollama ollama run llama3.1:8b
+docker exec -it ollama ollama run llama3
 ```
 
-The first time you issue the Ollama `run` command it downloads and installs the LLM. Your terminal session may time out 
-during the installation, but the LLM was probably successfully installed. Reconnect to the Ollama Docker container then 
-rerun the `ollama run llama3.1:8b` command. The Ollama prompt should return quickly since the llama3 LLM is already 
-installed from the first attempt. Try asking it a question.
-
-```shell
-docker exec -it ollama ollama run llama3.1:8b
-
->>> You are a newly installed LLM. Please tell me your version in six lines or less.
-
-I'm an LLaMA 13 model, specifically trained for conversation and creativity. My knowledge cutoff is September 2022, and 
-I have been fine-tuned to provide accurate and engaging responses. I can generate text on a wide range of topics, from 
-science and history to entertainment and culture.
-
->>>/bye
+These are commands for the Ollama CLI
+```
+Available Commands:
+  serve       Start ollama
+  create      Create a model from a Modelfile
+  show        Show information for a model
+  run         Run a model
+  pull        Pull a model from a registry
+  push        Push a model to a registry
+  list        List models
+  ps          List running models
+  cp          Copy a model
+  rm          Remove a model
+  help        Help about any command
 ```
 
 You also need to pull the embedding model. Ollama supports [three embedding models](https://ollama.com/blog/embedding-models).
@@ -190,7 +183,7 @@ You also need to pull the embedding model. Ollama supports [three embedding mode
 | [all-minilm](https://ollama.com/library/all-minilm)               | 23M          |
 
 After deciding which embedding model is best for you, follow these steps:
-1) __Pull the Embedding Model__—Use the Ollama CLI to pull down the embedding model that you select.
+1) __Pull the Embedding Model__—Use the Ollama CLI to pull down the embedding model that you select. For instance, `docker exec -it ollama ollama pull all-minilm`.
 2) __Update the Ollama Embedding Model Property__—Update `spring.ai.ollama.embedding.model` to specify the new embedding model.
 3) __Update the Vector Store Dimensions__—Update `spring.ai.vectorstore.pgvector.dimensions` to match the new embedding model.
 4) __Drop the Vector Storage Table__—Run `DROP TABLE` on the vector storage table.
@@ -218,7 +211,7 @@ spring:
       base-url: http://localhost:11434
       chat:
         options:
-          model: llama3.1:8b
+          model: llama3
       embedding:
         enabled: true
         model: all-minilm

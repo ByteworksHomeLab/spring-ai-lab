@@ -33,11 +33,12 @@ public class AirbnbController {
 
     private final VectorStore vectorStore;
     private static final SystemMessage systemMessage = new SystemMessage("""
-        - You work for Airbnb.
-        - You help hosts write better descriptions for airbnb listings.
-        - Rewrite the user's Airbnb description using the information provided by the user in their prompt. DO NOT change the number of rooms or number of bathrooms.
+//        - You work for Airbnb.
+//        - You help hosts write better descriptions for airbnb listings.
+        - Rewrite the user's Airbnb description using the information provided by the user in their prompt.
+        - DO NOT change the number of rooms or number of bathrooms from the host's description.
         - When rewriting the user's description consider similar descriptions from the LISTINGS section.
-        - Write the response using HTML.
+        - Return your single best-rewritten description.
     """);
 
     private final Resource listingsTemplateResource;
