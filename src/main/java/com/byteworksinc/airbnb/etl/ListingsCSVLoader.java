@@ -31,10 +31,9 @@ public class ListingsCSVLoader implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(ListingsCSVLoader.class);
     private final ListingRepository listingRepository;
     private final boolean loadListings;
-
-    private final ListingEmbedder listingEmbedder;
     private final boolean clearListingsTable;
-    private final boolean embedListings;
+    private final boolean writeJSONFiles;
+    private final IngestionService ingestionService;
 
     @Value("classpath:/data/listings.csv")
     private Resource listingsCSVResource;
@@ -55,18 +54,18 @@ public class ListingsCSVLoader implements CommandLineRunner {
             "calculated_host_listings_count_private_rooms", "calculated_host_listings_count_shared_rooms", "reviews_per_month"};
 
     public ListingsCSVLoader(final ListingRepository listingRepository,
-                             final ListingEmbedder listingEmbedder,
-                             @Value("${embedListings}")
-                             final boolean embedListings,
+                             final IngestionService ingestionService,
                              @Value("${airbnbLoadListings}")
                              final boolean loadListings,
                              @Value("${clearAirbnbListingsTable}")
-                             final boolean clearListingsTable) {
+                             final boolean clearListingsTable,
+                             @Value("${writeJSONFiles}")
+                             final boolean writeJSONFiles) {
         this.listingRepository = listingRepository;
-        this.listingEmbedder = listingEmbedder;
+        this.ingestionService = ingestionService;
         this.loadListings = loadListings;
-        this.embedListings = embedListings;
         this.clearListingsTable = clearListingsTable;
+        this.writeJSONFiles = writeJSONFiles;
     }
 
     @Override
@@ -193,24 +192,22 @@ public class ListingsCSVLoader implements CommandLineRunner {
             listings.add(listing);
             if (count % 250 == 0) {
                 log.info("Saving listing {}.", count);
-                saveListings(listings);
+                listingRepository.saveAll(listings);
+                if (writeJSONFiles) {
+                    ingestionService.writeJSONFile(listings);
+                }
                 listings.clear();
             }
-
-
         }
-        saveListings(listings);
+        listingRepository.saveAll(listings);
+        if (writeJSONFiles) {
+            ingestionService.writeJSONFile(listings);
+        }
         log.info("Wrote {} listings.", count);
     }
 
-    public void saveListings(List<Listing> listings) {
-        if (listings != null && !listings.isEmpty()) {
-            listingRepository.saveAll(listings);
-            if (embedListings) {
-                listingEmbedder.embedListing(listings);
-            }
-        }
-    }
+
+
 
     private Integer getInteger(CSVRecord record, String columnName) {
         if (record != null && columnName != null) {
