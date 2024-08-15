@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.messaging.Message;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -22,37 +23,36 @@ public class CloudFunctionConfig {
     private static final Logger log = LoggerFactory.getLogger(CloudFunctionConfig.class);
 
     @Bean
-    Function<Flux<Message<byte[]>>, Flux<List<Document>>> documentReader() {
-        log.info("documentReader");
+    Function<Flux<byte[]>, Flux<Document>> documentReader() {
         return resourceFlux -> resourceFlux
-                .map(message ->
-                        new JsonReader(new ByteArrayResource(message.getPayload()))
+                .doOnNext(message -> log.info("documentReader() called"))
+                .map(fileBytes ->
+                        new JsonReader(
+                                new ByteArrayResource(fileBytes))
                                 .get()
-                                .stream()
-                                .peek(document -> {
-                                    document.getMetadata()
-                                            .put("source", message.getHeaders().get("file_name"));
-                                })
-                                .toList()
-                );
+                                .getFirst()).subscribeOn(Schedulers.boundedElastic());
     }
 
     @Bean
-    Function<Flux<List<Document>>, Flux<List<Document>>> documentTransformer() {
-        log.info("documentTransformer");
-        return documentListFlux ->
-                documentListFlux
-                        .map(unsplitList -> new TokenTextSplitter().apply(unsplitList));
+    Function<Flux<Document>, Flux<List<Document>>> documentTransformer() {
+        return documentFlux ->
+                documentFlux
+                        .doOnNext(message -> log.info("documentTransformer() called"))
+                        .map(incoming ->
+                                new TokenTextSplitter().apply(List.of(incoming))).subscribeOn(Schedulers.boundedElastic());
     }
 
     @Bean
-    Consumer<Flux<List<Document>>> documentWriter(VectorStore vectorStore) {
-        log.info("documentWriter");
+    Consumer<Flux<List<Document>>> vectorStoreConsumer(VectorStore vectorStore) {
         return documentFlux -> documentFlux
+                .doOnNext(message -> log.info("vectorStoreConsumer() called"))
                 .doOnNext(documents -> {
-                    log.info("Writing {} documents to vector store.", documents.size());
+                    long docCount = documents.size();
+                    log.info("Writing {} documents to vector store.", docCount);
+
                     vectorStore.accept(documents);
-                    log.info("{} documents have been written to vector store.", documents.size());
+
+                    log.info("{} documents have been written to vector store.", docCount);
                 })
                 .subscribe();
     }

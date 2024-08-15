@@ -5,7 +5,7 @@ spring:
     name: spring-ai-airbnb
   cloud:
     function:
-      definition: "fileSupplier|documentReader|documentTransformer|documentWriter"
+      definition: fileSupplier|documentReader|documentTransformer|vectorStoreConsumer
   datasource:
     url: jdbc:postgresql://${DB_HOST}:5432/${DATABASE_NAME}
     username: ${DB_USER}
@@ -73,5 +73,4 @@ etl:
   clearAirbnbListingsTable: false
 file:
   supplier:
-    directory: ${TMPDIR}/file-supplier
-    filename-regex: .*\.(pdf|docx|txt|pages|csv|json)
+    filename-regex: .*\.(txt|json)

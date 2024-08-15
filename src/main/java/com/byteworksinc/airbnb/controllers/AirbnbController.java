@@ -12,6 +12,7 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -96,8 +97,8 @@ public class AirbnbController {
     }
 
     @GetMapping("/run-ingestion")
-    public String ingest() {
+    public ResponseEntity<?> ingest() {
         ingestionService.ingest();
-        return "Ingestion started";
+        return ResponseEntity.accepted().build();
     }
 }
