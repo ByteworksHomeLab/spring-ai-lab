@@ -3,6 +3,9 @@ spring:
     default: llama3
   application:
     name: spring-ai-airbnb
+  cloud:
+    function:
+      definition: "fileSupplier|documentReader|documentTransformer|documentWriter"
   datasource:
     url: jdbc:postgresql://${DB_HOST}:5432/${DATABASE_NAME}
     username: ${DB_USER}
@@ -14,6 +17,10 @@ spring:
         index-type: HNSW
         distance-type: COSINE_DISTANCE
         dimensions: 384
+  docker:
+    compose:
+      file: ./docker-compose.yml
+      lifecycle-management: start_only
   sql:
     init:
       mode: always
@@ -62,6 +69,9 @@ spring:
           temperature: 0.7
       base-url: https://api.groq.com/openai
 etl:
-  embedListings: true
   airbnbLoadListings: true
   clearAirbnbListingsTable: false
+file:
+  supplier:
+    directory: ${TMPDIR}/file-supplier
+    filename-regex: .*\.(pdf|docx|txt|pages|csv|json)

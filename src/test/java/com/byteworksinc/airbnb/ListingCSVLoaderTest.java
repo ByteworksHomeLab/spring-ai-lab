@@ -33,7 +33,7 @@ public class ListingCSVLoaderTest {
     private ListingsCSVLoader listingsCSVLoader;
 
     @Autowired
-    private ListingRepository listingDao;
+    private ListingRepository listingRepository;
 
     @Test
     void connectionEstablished() {
@@ -44,12 +44,12 @@ public class ListingCSVLoaderTest {
     @Test
     public void testReadListingCsvFile() {
         try {
-            listingDao.deleteAll();
+            listingRepository.deleteAll();
             listingsCSVLoader.readListingCsvFile();
-            List<Listing> listings = listingDao.findAll();
+            List<Listing> listings = listingRepository.findAll();
             assertEquals(15159, listings.size());
         } finally {
-            listingDao.deleteAll();
+            listingRepository.deleteAll();
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.byteworksinc.airbnb.controllers;
 
+import com.byteworksinc.airbnb.etl.IngestionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.messages.Message;
@@ -32,6 +33,7 @@ public class AirbnbController {
     private static final Logger log = LoggerFactory.getLogger(AirbnbController.class);
 
     private final VectorStore vectorStore;
+    private final IngestionService ingestionService;
     private static final SystemMessage systemMessage = new SystemMessage("""
 //        - You work for Airbnb.
 //        - You help hosts write better descriptions for airbnb listings.
@@ -47,10 +49,14 @@ public class AirbnbController {
 
     private final ChatModel chatModel;
 
-    public AirbnbController(final ChatModel chatModel, final VectorStore vectorStore, @Value("classpath:/templates/listing.st") Resource listingsTemplateResource) {
+    public AirbnbController(final ChatModel chatModel,
+                            final VectorStore vectorStore,
+                            final IngestionService ingestionService,
+                            @Value("classpath:/templates/listing.st") Resource listingsTemplateResource) {
         this.chatModel = chatModel;
         this.vectorStore = vectorStore;
         this.listingsTemplateResource = listingsTemplateResource;
+        this.ingestionService = ingestionService;
         this.initPromptTemplate();
     }
 
@@ -87,5 +93,11 @@ public class AirbnbController {
         Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
         return this.chatModel.call(prompt)
                 .getResult().getOutput().getContent();
+    }
+
+    @GetMapping("/run-ingestion")
+    public String ingest() {
+        ingestionService.ingest();
+        return "Ingestion started";
     }
 }

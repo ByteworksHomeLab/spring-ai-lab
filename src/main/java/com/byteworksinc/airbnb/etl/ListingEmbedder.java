@@ -19,12 +19,9 @@ public class ListingEmbedder {
     private static final Logger log = LoggerFactory.getLogger(ListingEmbedder.class);
 
     private final VectorStore vectorStore;
-    private final TokenTextSplitter tokenTextSplitter;
 
-    public ListingEmbedder(final VectorStore vectorStore,
-                           final TokenTextSplitter tokenTextSplitter) {
+    public ListingEmbedder(final VectorStore vectorStore) {
         this.vectorStore = vectorStore;
-        this.tokenTextSplitter = tokenTextSplitter;
     }
 
     public static String asString(Object value) {
@@ -51,7 +48,7 @@ public class ListingEmbedder {
                             "bathrooms", asString(listing.bathrooms())
                     ));
             try {
-                var split = this.tokenTextSplitter
+                var split = new TokenTextSplitter()
                         .apply(List.of(document));
                 vectorStore.add(split);
             } catch (RuntimeException e) {

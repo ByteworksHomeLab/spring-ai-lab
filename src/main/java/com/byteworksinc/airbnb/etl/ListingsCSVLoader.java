@@ -11,19 +11,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Component
 public class ListingsCSVLoader implements CommandLineRunner {
@@ -31,10 +25,8 @@ public class ListingsCSVLoader implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(ListingsCSVLoader.class);
     private final ListingRepository listingRepository;
     private final boolean loadListings;
-
-    private final ListingEmbedder listingEmbedder;
     private final boolean clearListingsTable;
-    private final boolean embedListings;
+    private final IngestionService ingestionService;
 
     @Value("classpath:/data/listings.csv")
     private Resource listingsCSVResource;
@@ -55,17 +47,14 @@ public class ListingsCSVLoader implements CommandLineRunner {
             "calculated_host_listings_count_private_rooms", "calculated_host_listings_count_shared_rooms", "reviews_per_month"};
 
     public ListingsCSVLoader(final ListingRepository listingRepository,
-                             final ListingEmbedder listingEmbedder,
-                             @Value("${embedListings}")
-                             final boolean embedListings,
+                             final IngestionService ingestionService,
                              @Value("${airbnbLoadListings}")
                              final boolean loadListings,
                              @Value("${clearAirbnbListingsTable}")
                              final boolean clearListingsTable) {
         this.listingRepository = listingRepository;
-        this.listingEmbedder = listingEmbedder;
+        this.ingestionService = ingestionService;
         this.loadListings = loadListings;
-        this.embedListings = embedListings;
         this.clearListingsTable = clearListingsTable;
     }
 
@@ -193,24 +182,20 @@ public class ListingsCSVLoader implements CommandLineRunner {
             listings.add(listing);
             if (count % 250 == 0) {
                 log.info("Saving listing {}.", count);
-                saveListings(listings);
+                listingRepository.saveAll(listings);
+                ingestionService.writeJSONFile(listings);
                 listings.clear();
             }
 
 
         }
-        saveListings(listings);
+        listingRepository.saveAll(listings);
+        ingestionService.writeJSONFile(listings);
         log.info("Wrote {} listings.", count);
     }
 
-    public void saveListings(List<Listing> listings) {
-        if (listings != null && !listings.isEmpty()) {
-            listingRepository.saveAll(listings);
-            if (embedListings) {
-                listingEmbedder.embedListing(listings);
-            }
-        }
-    }
+
+
 
     private Integer getInteger(CSVRecord record, String columnName) {
         if (record != null && columnName != null) {
