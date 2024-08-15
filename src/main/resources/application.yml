@@ -36,7 +36,7 @@ spring:
       on-profile: "llama3"
   ai:
     ollama:
-      base-url: http://${DB_HOST}:11434
+      base-url: http://${OLLAMA_HOST}:11434
       chat:
         model: llama3.1:8b
       embedding:
@@ -70,7 +70,8 @@ spring:
       base-url: https://api.groq.com/openai
 etl:
   airbnbLoadListings: true
-  clearAirbnbListingsTable: false
+  writeJSONFiles: true
+  clearAirbnbListingsTable: true
 file:
   supplier:
     filename-regex: .*\.(txt|json)

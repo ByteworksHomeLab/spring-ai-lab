@@ -111,8 +111,9 @@ export DB_USER=my-postgres-username
 export DB_PASSWORD=my-postgres-password
 export DB_HOST=localhost
 export DATABASE_NAME=airbnb
+export OLLAMA_HOST=localhost
 export OPENAI_API_KEY=my-openai-api-key
-export Groq_API_KEY=my-grok-api-key
+export GROK_API_KEY=my-grok-api-key
 ```
 
 Use any credentials you want for Postgres, plus the Groq and OpenAI API keys created above. The `gitignore` file already
@@ -229,7 +230,7 @@ Update `spring.ai.ollama.embedding.model` to specify the new embedding model.
 spring:
   ai:
     ollama:
-      base-url: http://localhost:11434
+      base-url: http://${OLLAMA_HOST}:11434
       chat:
         options:
           model: llama3.1:8b

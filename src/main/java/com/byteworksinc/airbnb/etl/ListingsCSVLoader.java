@@ -11,13 +11,19 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 @Component
 public class ListingsCSVLoader implements CommandLineRunner {
@@ -26,6 +32,7 @@ public class ListingsCSVLoader implements CommandLineRunner {
     private final ListingRepository listingRepository;
     private final boolean loadListings;
     private final boolean clearListingsTable;
+    private final boolean writeJSONFiles;
     private final IngestionService ingestionService;
 
     @Value("classpath:/data/listings.csv")
@@ -51,11 +58,14 @@ public class ListingsCSVLoader implements CommandLineRunner {
                              @Value("${airbnbLoadListings}")
                              final boolean loadListings,
                              @Value("${clearAirbnbListingsTable}")
-                             final boolean clearListingsTable) {
+                             final boolean clearListingsTable,
+                             @Value("${writeJSONFiles}")
+                             final boolean writeJSONFiles) {
         this.listingRepository = listingRepository;
         this.ingestionService = ingestionService;
         this.loadListings = loadListings;
         this.clearListingsTable = clearListingsTable;
+        this.writeJSONFiles = writeJSONFiles;
     }
 
     @Override
@@ -183,14 +193,16 @@ public class ListingsCSVLoader implements CommandLineRunner {
             if (count % 250 == 0) {
                 log.info("Saving listing {}.", count);
                 listingRepository.saveAll(listings);
-                ingestionService.writeJSONFile(listings);
+                if (writeJSONFiles) {
+                    ingestionService.writeJSONFile(listings);
+                }
                 listings.clear();
             }
-
-
         }
         listingRepository.saveAll(listings);
-        ingestionService.writeJSONFile(listings);
+        if (writeJSONFiles) {
+            ingestionService.writeJSONFile(listings);
+        }
         log.info("Wrote {} listings.", count);
     }
 

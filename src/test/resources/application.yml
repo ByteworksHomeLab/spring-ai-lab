@@ -23,6 +23,7 @@ spring:
         model: all-minilm
 etl:
   airbnbLoadListings: false
+  writeJSONFiles: false
   clearAirbnbListingsTable: false
 file:
   supplier:

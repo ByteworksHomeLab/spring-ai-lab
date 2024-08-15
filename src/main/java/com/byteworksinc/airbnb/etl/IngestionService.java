@@ -1,10 +1,10 @@
 package com.byteworksinc.airbnb.etl;
+
 import com.byteworksinc.airbnb.entities.Listing;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.cloud.fn.supplier.file.FileSupplierProperties;
 import org.springframework.cloud.function.context.FunctionCatalog;
 import org.springframework.stereotype.Service;
@@ -44,24 +44,26 @@ public class IngestionService {
      * @param listings - The Airbnb Lists to be written to the JSON File
      */
     public void writeJSONFile(List<Listing> listings) {
+        if (listings != null && !listings.isEmpty()) {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 File ingestionDir = getIngestionDirectory();
-                ingestionDir.mkdirs();
                 String jsonArray
                         = objectMapper.writeValueAsString(listings);
                 File file = new File(ingestionDir, UUID.randomUUID() + ".json");
-                try(FileOutputStream output = new FileOutputStream(file)){
+                try (FileOutputStream output = new FileOutputStream(file)) {
                     byte[] array = jsonArray.getBytes();
                     output.write(array);
                     output.close();
-                    log.info("Wrote file {}", file.getAbsolutePath());
-                } catch(IOException e) {
+                    log.info("Wrote file {} with {} listings", file.getName(), listings.size());
+                } catch (IOException e) {
                     log.error("Could not write JSON to temporary directory", e);
                 }
             } catch (JsonProcessingException e) {
                 log.error("Could not map Listing", e);
+            } catch (RuntimeException e) {
+                log.error("Could not write JSON listing");
             }
+        }
     }
-
 }
