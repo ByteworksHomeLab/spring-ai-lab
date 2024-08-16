@@ -69,9 +69,10 @@ spring:
           temperature: 0.7
       base-url: https://api.groq.com/openai
 etl:
-  airbnbLoadListings: true
-  writeJSONFiles: true
-  clearAirbnbListingsTable: true
+  airbnbLoadListings: false
+  writeJSONFiles: false
+  clearAirbnbListingsTable: false
 file:
   supplier:
+    directory: ${TMPDIR}/file-supplier
     filename-regex: .*\.(txt|json)

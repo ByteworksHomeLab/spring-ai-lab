@@ -27,7 +27,7 @@ public class ChatController {
     @GetMapping("/")
     public String prompt(@RequestParam(value = "message", defaultValue = "Tell me a dad joke") String message) {
         log.info("prompt() <- {}", message);
-        return this.chatClient.prompt()
+        return chatClient.prompt()
                 .user(message)
                 .call()
                 .content(); // short for getResult().getOutput().getContent();

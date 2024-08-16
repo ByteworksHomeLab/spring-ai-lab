@@ -3,12 +3,15 @@ package com.byteworksinc.airbnb.controllers;
 import com.byteworksinc.airbnb.etl.IngestionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -35,14 +38,6 @@ public class AirbnbController {
 
     private final VectorStore vectorStore;
     private final IngestionService ingestionService;
-    private static final SystemMessage systemMessage = new SystemMessage("""
-//        - You work for Airbnb.
-//        - You help hosts write better descriptions for airbnb listings.
-        - Rewrite the user's Airbnb description using the information provided by the user in their prompt.
-        - DO NOT change the number of rooms or number of bathrooms from the host's description.
-        - When rewriting the user's description consider similar descriptions from the LISTINGS section.
-        - Return your single best-rewritten description.
-    """);
 
     private final Resource listingsTemplateResource;
 
@@ -50,11 +45,15 @@ public class AirbnbController {
 
     private final ChatModel chatModel;
 
+    private final ChatClient chatClient;
+
     public AirbnbController(final ChatModel chatModel,
+                            final ChatClient chatClient,
                             final VectorStore vectorStore,
                             final IngestionService ingestionService,
                             @Value("classpath:/templates/listing.st") Resource listingsTemplateResource) {
         this.chatModel = chatModel;
+        this.chatClient = chatClient;
         this.vectorStore = vectorStore;
         this.listingsTemplateResource = listingsTemplateResource;
         this.ingestionService = ingestionService;
@@ -87,6 +86,12 @@ public class AirbnbController {
             listings.add(document.getContent());
         }
         log.info("promptStuffing() found {} similar results", documents.size());
+        SystemMessage systemMessage = new SystemMessage("""
+            - Rewrite the user's Airbnb description using the information provided by the user in their prompt.
+            - DO NOT change the number of rooms or number of bathrooms from the host's description.
+            - When rewriting the user's description consider similar descriptions from the LISTINGS section.
+            - Return your single best-rewritten description.
+        """);
         Message userMessage = promptTemplate.createMessage(Map.of(
                 "input", message,
                 "listings", listings
@@ -94,6 +99,26 @@ public class AirbnbController {
         Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
         return this.chatModel.call(prompt)
                 .getResult().getOutput().getContent();
+    }
+
+    /**
+     * If you aren't using a GPU, this method may take a couple of minutes to return the result.
+     * @param message e.g. http://localhost:8080/rag?message=2%20bedroom%2c2%20bath%2cclose%20to%20downtown%20austin
+     * @return - A generated description based on your input that is similar to listings returned from the vector database.
+     */
+    @GetMapping("/rag")
+    public String rag(@RequestParam String message) {
+        log.info("rag() <- {}", message);
+        return this.chatClient.prompt()
+                .system("""
+                        - Rewrite the user's Airbnb description using the information provided by the user in their prompt.
+                        - DO NOT change the number of rooms or number of bathrooms from the host's description.
+                        - Return your single best-rewritten description.
+                    """)
+                .user(message)
+                .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults()))
+                .call()
+                .content(); // short for getResult().getOutput().getContent();
     }
 
     @GetMapping("/run-ingestion")

@@ -48,6 +48,7 @@ public class IngestionService {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 File ingestionDir = getIngestionDirectory();
+                ingestionDir.mkdirs();
                 String jsonArray
                         = objectMapper.writeValueAsString(listings);
                 File file = new File(ingestionDir, UUID.randomUUID() + ".json");
