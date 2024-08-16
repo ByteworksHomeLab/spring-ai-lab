@@ -48,12 +48,12 @@ public class AirbnbController {
     private final ChatClient chatClient;
 
     public AirbnbController(final ChatModel chatModel,
-                            final ChatClient chatClient,
+                            final ChatClient.Builder builder,
                             final VectorStore vectorStore,
                             final IngestionService ingestionService,
                             @Value("classpath:/templates/listing.st") Resource listingsTemplateResource) {
         this.chatModel = chatModel;
-        this.chatClient = chatClient;
+        this.chatClient = builder.build();
         this.vectorStore = vectorStore;
         this.listingsTemplateResource = listingsTemplateResource;
         this.ingestionService = ingestionService;
@@ -98,7 +98,9 @@ public class AirbnbController {
         ));
         Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
         return this.chatModel.call(prompt)
-                .getResult().getOutput().getContent();
+                .getResult()
+                .getOutput()
+                .getContent();
     }
 
     /**
