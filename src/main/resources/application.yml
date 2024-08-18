@@ -5,7 +5,7 @@ spring:
     name: spring-ai-airbnb
   cloud:
     function:
-      definition: fileSupplier|documentReader|documentTransformer|vectorStoreConsumer
+      definition: csvFileSupplier|csvReader|documentTransformer|vectorStoreConsumer
   datasource:
     url: jdbc:postgresql://${DB_HOST}:5432/${DATABASE_NAME}
     username: ${DB_USER}
@@ -21,14 +21,6 @@ spring:
     compose:
       file: ./docker-compose.yml
       lifecycle-management: start_only
-  sql:
-    init:
-      mode: always
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
 ---
 spring:
   config:
@@ -67,11 +59,3 @@ spring:
           model: llama3-70b-8192
           temperature: 0.7
       base-url: https://api.groq.com/openai
-etl:
-  airbnbLoadListings: false
-  writeJSONFiles: false
-  clearAirbnbListingsTable: false
-file:
-  supplier:
-    directory: ${TMPDIR}/file-supplier
-    filename-regex: .*\.(txt|json)

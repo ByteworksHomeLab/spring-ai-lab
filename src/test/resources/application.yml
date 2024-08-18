@@ -6,13 +6,6 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-  docker:
-    compose:
-      file: docker-compose.yml
-      lifecycle-management: none
-  sql:
-    init:
-      mode: always
   ai:
     ollama:
       base-url: http://localhost:11434
@@ -21,11 +14,4 @@ spring:
       embedding:
         enabled: true
         model: all-minilm
-etl:
-  airbnbLoadListings: false
-  writeJSONFiles: false
-  clearAirbnbListingsTable: false
-file:
-  supplier:
-    directory: ${TMPDIR}/file-supplier
-    filename-regex: .*\.(pdf|docx|txt|pages|csv|json)
+
