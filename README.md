@@ -30,10 +30,6 @@ This project is an introduction to Spring AI. It demonstrates running three LLMs
 The project uses a combination of Maven profiles and Spring profiles to switch between the LLMs without having to change
 any Java code.
 
-The project relies on Docker for simplicity, as pictured here:
-
-![Spring AI Ollama.png](src%2Fmain%2Fresources%2Fstatic%2FSpring%20AI%20Ollama.png)
-
 __At the end of this README file, you'll learn how to get up and running with OpenAI in less than 15 minutes__.
 
 ## Use Cases
