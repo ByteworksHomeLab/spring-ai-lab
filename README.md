@@ -1,5 +1,17 @@
 # Spring AI Lab
 
+Do you want to make your Java apps smarter? This lab will help. It shows you how to add cool AI features to your Java projects using the Spring 
+framework. It's perfect for beginners who want to start using AI.
+
+It covers the following:
+• Simple Chatbots: Learn how to build basic chatbots that can talk to users using Spring Boot.
+• Smart Answers with AI: Discover how to create apps that give better answers by combining search with AI tools.
+• Vector Databases: Find out how to use special databases that help AI apps handle lots of information quickly.
+• AI Workflows: See how to set up workflows that let your apps do complex tasks on their own.
+
+By the end, you’ll have the skills and examples you need to start using AI in your Spring apps. Learn how to make your Java projects even more amazing with AI!
+
+
 ## Audience
 The audience or this project is Spring Framework application developers who are new to artificial intelligence. It is
 expected that you know your way around the Spring Framework, but we don't assume any AI experience.
@@ -22,11 +34,6 @@ The project relies on Docker for simplicity, as pictured here:
 
 ![Spring AI Ollama.png](src%2Fmain%2Fresources%2Fstatic%2FSpring%20AI%20Ollama.png)
 
-JUnit tests use [Spring Testcontainers](https://docs.spring.io/spring-boot/reference/testing/testcontainers.html) to 
-dynamically provision a Postgres container with the vector extension. The Spring Boot application uses the [Spring Boot Docker Compose library](https://spring.io/blog/2023/06/21/docker-compose-support-in-spring-boot-3-1) 
-to automatically launch Docker Compose, providing both Ollama and Postgres PGVector at runtime. The only thing not 
-automated is the installation of the Llama3 LLM, but that is a one-time task (unless the Docker volume gets deleted).
-
 __At the end of this README file, you'll learn how to get up and running with OpenAI in less than 15 minutes__.
 
 ## Use Cases
@@ -42,12 +49,13 @@ an opensource large language model with proprietary company data. These are the 
 ## Getting Started
 The purpose of this project is to dip your toes into the AI waters. We'll demonstrate using Spring AI calling OpenAI and 
 Groq via their respective APIs, so you'll need to sign up for free API keys from both. Also, we'll install Ollama to run 
-the Llama3 LLM locally. Ollama is Like VirtualBox or Docker Desktop, but instead of running virtual machines or containers, 
-it runs LLMs. One caveat is that you'll need realistic expectations about local LLM performance.
+the Llama3 LLM locally. Ollama is to LLMs what VirtualBox is to virtual machines or Docker Desktop to containers, but instead
+of running virtual machines or containers, Ollama runs LLMs. One caveat is that you'll need realistic expectations about local LLM performance.
 
 ### What about GPUs?
-The good news is that you can do this lab without a GPU as long as you have patience, although, for longer term use you'll want a GPU. 
-Ollama support Nvidia and AMD GPUs. See the [Ollama GPU Documentation page](https://github.com/ollama/ollama/blob/main/docs/gpu.md).
+AI does lots of parallel vector math, and GPUs handle lots of parallel processes to render displays, which is why they go well together.
+The good news is that you can do this lab without a GPU as long as you have patience, although, for longer term use, you'll want a GPU. 
+Ollama supports Nvidia and AMD GPUs. See the [Ollama GPU Documentation page](https://github.com/ollama/ollama/blob/main/docs/gpu.md).
 
 ## Preconditions
 
@@ -75,7 +83,8 @@ includes vector database support. PGVector is defined in the `docker-compose.yam
 ### 4) Ollama
 
 [Ollama](https://ollama.com) is an opensource platform for running LLMs locally. It makes it easier to get started with AI by hiding 
-the complexities of running a LLM (Large Language Model). Choose between the [Ollama Docker image](https://hub.docker.com/r/ollama/ollama), or [downloading the binary to your operating system](https://ollama.com/download/).
+the complexities of running a LLM (Large Language Model). Choose between the [Ollama Docker image](https://hub.docker.com/r/ollama/ollama), or 
+[downloading the binary to your operating system](https://ollama.com/download/).
 
 Ollama is also defined in the `docker-compose.yaml` file at the root of the project.
 
@@ -117,7 +126,7 @@ export GROK_API_KEY=my-grok-api-key
 ```
 
 Use any credentials you want for Postgres, plus the Groq and OpenAI API keys created above. The `gitignore` file already
-contains and entry for a file named `env.sh.` Use the ". ./path" syntax on Mac or Linux to add the environment variables 
+contains and entry for a file named `env.sh.` Use the ". ./env.sh" syntax on Mac or Linux to add the environment variables 
 to the terminal session, as shown here:
 
 ```shell
@@ -130,7 +139,7 @@ thing for Application.java or Docker if you like.
 ![IntelliJ Runtime](src/main/resources/static/intellij-runtime.png)
 
 ### Launch Ollama and PGVector Together Using Docker Compose for the First Time
-Now you are ready to try out the `Docker Compose` file. Normally, running Spring Boot starts Docker Compose automatically 
+Now, you are ready to try out the `Docker Compose` file. Normally, running Spring Boot starts Docker Compose automatically 
 because of the `spring-boot-docker-compose` library, but we want to do some housekeeping first.
 
 Start `Docker Compose` from the root of the project as shown:
@@ -153,15 +162,16 @@ postgres   pgvector/pgvector:pg16   "docker-entrypoint.s…"   postgres   29 min
 You can also confirm that the Ollama API is ready by navigating to [http://localhost:11434](http://localhost:11434) in a web browser. 
 It should return the message: "Ollama is running."
 
-Next, install the LLama3 LLM using the `ollama` CLI installed on the Ollama Docker container.
+First, install an embedding model using the `ollama` CLI installed on the Ollama Docker container. We'll cover that late, though:
+
+```shell
+docker exec -it ollama ollama pull all-minilm
+```
+
+Next, install the LLama3 LLM 
 
 ```shell
 docker exec -it ollama ollama run llama3.1:8b
-```
-
-Install any other desired LLMs the same way.
-```shell
-docker exec -it ollama ollama run codegemma:2b
 ```
 
 The first time you issue the Ollama `run` command it downloads and installs the LLM. Your terminal session may time out during the installation, but the LLM was probably successfully installed.
@@ -180,7 +190,7 @@ I’m still learning and improving every day, but I’m ready to chat with you!
 >>> /bye
 ```
 
-These are commands for the Ollama CLI
+These are all the commands for the Ollama CLI:
 ```
 Available Commands:
   serve       Start ollama
@@ -196,7 +206,7 @@ Available Commands:
   help        Help about any command
 ```
 
-You also need to pull the embedding model. Ollama supports [three embedding models](https://ollama.com/blog/embedding-models).
+In the steps above, you pulled an embedding model, `all-minilm`. Ollama supports [three embedding models](https://ollama.com/blog/embedding-models).
 
 | Embedding Model                                                   | Parameters   |
 |-------------------------------------------------------------------|--------------|
@@ -204,19 +214,23 @@ You also need to pull the embedding model. Ollama supports [three embedding mode
 | [nomic-embed-text](https://ollama.com/library/nomic-embed-text)   | 137M         |
 | [all-minilm](https://ollama.com/library/all-minilm)               | 23M          |
 
-After deciding which embedding model is best for you, follow these steps:
+Whenever you change the embedding model, follow these steps. We've already made these changes for the `all-minilm` embedding model.
+
 1) __Pull the Embedding Model__—Use the Ollama CLI to pull down the embedding model that you select. For instance, `docker exec -it ollama ollama pull all-minilm`.
 2) __Update the Ollama Embedding Model Property__—Update `spring.ai.ollama.embedding.model` to specify the new embedding model.
 3) __Update the Vector Store Dimensions__—Update `spring.ai.vectorstore.pgvector.dimensions` to match the new embedding model.
 4) __Drop the Vector Storage Table__—Run `DROP TABLE` on the vector storage table.
 
-Stop the application and shutdown Docker Compose before performing these steps.
+Stop the application and shutdown Docker Compose before performing these steps. The next time your run the Spring Boot application it will automatially 
+recreate the vector_store table.
 
 ```shell
 docker compose down
 ```
 
 #### 1) Pull the Embedding Model
+Here is a detailed review of the steps above for your future reference.
+
 Use the `ollama pull` command to pull down the embedding model.
 
 ```shell
@@ -239,12 +253,9 @@ spring:
         model: all-minilm
 ```
 
-Here is an [example GitHub repository](https://github.com/benayat/rag-with-spring-ai/blob/master/src/main/resources/application.yml) 
-showing of what is possible with the embedding settings. One of Benayat's other repos is an H2 in-memory vector database.
-
 ### 3) Update the Vector Store Dimensions
 Update `spring.ai.vectorstore.pgvector.dimensions` to match the new embedding model. If it doesn't match, you will get 
-an error. That is how I knew what dimensions to 384 after switching the embedding model to `all-minilm.`
+an error. That is how I knew what dimensions to use (384 dimensions) after switching the embedding model to `all-minilm.`
 
 ```yaml
 spring:
@@ -257,7 +268,7 @@ spring:
 ```
 
 ### 4) Drop the Vector Storage Table
-Run `DROP TABLE` on the vector storage table. 
+Connect to the airbnb database in PostgreSQL and locate the `vector_table`, then drop it.
 
 ```sql
 DROP TABLE vector_store;
@@ -315,6 +326,38 @@ If you want to use Groq, then you must set the Maven profile to "openapi" and Sp
 mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=groq"
 ```
 
+## Vector Embedding
+
+At this point, the project should be running, but the vector database is empty. There is a CSV file with 15,000 Airbnb listings from Austin, TX.
+These need to run through the embedding model and written to the `vector_table`. A `/run-ingestion` was added as a convenient way to do the embedding.
+It takes about an hour to run, depending on your hardware. With the Spring Boot application running, paste this URL in your browser:
+
+```shell
+http://localhost:8080/run-ingestion
+```
+
+Messages like these will start appearing in the Spring Boot console output:
+
+```shell
+2024-08-18T19:54:53.398-05:00  INFO 13846 --- [spring-ai-airbnb] [oundedElastic-2] o.s.a.transformer.splitter.TextSplitter  : Splitting up document into 2 chunks.
+2024-08-18T19:54:53.762-05:00  INFO 13846 --- [spring-ai-airbnb] [oundedElastic-2] o.s.a.transformer.splitter.TextSplitter  : Splitting up document into 2 chunks.
+2024-08-18T19:54:55.383-05:00  INFO 13846 --- [spring-ai-airbnb] [oundedElastic-2] o.s.a.transformer.splitter.TextSplitter  : Splitting up document into 2 chunks.
+```
+
+Use SQL to verify the results:
+
+```sql
+select count(*) from vector_store;
+```
+
+There should be 16,249 rows in the vector table.
+
+To see the embedding value, run this query:
+
+```sql
+select content, embedding from vector_store limit 10;
+```
+
 # Build your own Spring AI Project from Scratch using OpenAI in under 10-minutes
 Okay, now that you know how to run everything in this [GitHub project](https://github.com/ByteworksHomeLab/spring-ai-lab), it's your turn to set up your own Spring AI 
 project. This will take less than 10 minutes.
@@ -341,45 +384,37 @@ spring:
           model: gpt-4o
 ```
 
-Next, define a Spring Bean for the Spring AI ChatClient.
+Next, add a REST endpoint.
 
 ```shell
-@Configuration
-public class Config {
-    @Bean
-    ChatClient chatClient(ChatClient.Builder builder) {
-        return builder.build();
-    }
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-}
-```
-
-Finally, add a REST endpoint that calls the autowired `chatClient.`
-
-```shell
 @RestController
 public class ChatController {
-
+    
     private final ChatClient chatClient;
 
-    public ChatController(final ChatClient chatClient) {
-        this.chatClient = chatClient;
+    public ChatController(final ChatClient.Builder builder) {
+        this.chatClient = builder.build();
     }
-
+    
     @GetMapping("/")
-    public String simplePrompt(@RequestParam(value = "message", defaultValue = "Tell me a dad joke") String message) {
-        return this.chatClient.prompt()
+    public String prompt(@RequestParam(value = "message", defaultValue = "Tell me a dad joke") String message) {
+        return chatClient.prompt()
                 .user(message)
                 .call()
-                .content(); 
+                .content(); // short for getResult().getOutput().getContent();
     }
-
 }
 ```
 
 That is all you need to get started. Make sure the unit test runs, then start the project and use ChatGPT.
 
-1) Run `mvn spring-boot:run`.
+1) Run `. ./env.sh`
+2) Run `mvn spring-boot:run`.
 2) Open http://localhost:8080?message=You are a Spring Developer Advocate. Tell me about Spring AI. Use HTML for the response.
 
 Next, take a look at this project and experiment with other features like Ollama and a vector database. Have fun!
