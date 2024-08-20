@@ -1,6 +1,6 @@
 package com.ahead.airbnb.controllers;
 
-import com.ahead.airbnb.etl.IngestionService;
+import com.ahead.airbnb.services.IngestionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -106,8 +106,12 @@ public class AirbnbController {
 
     /**
      * If you aren't using a GPU, this method may take a couple of minutes to return the result.
+     * In a broswer:
+     * http://localhost:8080/rag?message=2%20bedroom%2c2%20bath%2cclose%20to%20downtown%20austin
      *
-     * @param message e.g. http://localhost:8080/rag?message=2%20bedroom%2c2%20bath%2cclose%20to%20downtown%20austin
+     * With httpie CLI:
+     * http ":8080/rag?message=2 bedroom 2 bath close to downtown"
+     * @param message - The host's listing description
      * @return - A generated description based on your input that is similar to listings returned from the vector database.
      */
     @GetMapping("/rag")

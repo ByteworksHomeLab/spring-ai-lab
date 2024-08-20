@@ -1,4 +1,4 @@
-package com.ahead.airbnb.etl;
+package com.ahead.airbnb.functions;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -72,15 +72,15 @@ public class EtlCloudFunctions {
         return byteFlux -> byteFlux.publishOn(Schedulers.boundedElastic()).flatMap(bytes -> {
             try {
                 Reader reader = new InputStreamReader(new ByteArrayInputStream(bytes));
-                Iterable<CSVRecord> records = CSVFormat.DEFAULT.withHeader(headers).withFirstRecordAsHeader().parse(reader);
-
+                Iterable<CSVRecord> records = CSVFormat.DEFAULT
+                        .withHeader(headers)
+                        .withFirstRecordAsHeader()
+                        .parse(reader);
                 return Flux.fromIterable(records).map(record -> {
                     String name = record.get("name");
                     String description = record.get("description");
                     return new Document(name + " - " + description, Map.of("id", EtlCloudFunctions.getLong(record, "id"), "name", name, "description", description, "listingUrl", record.get("listing_url"), "price", record.get("price"), "propertyType", record.get("property_type"), "neighborhood", record.get("neighbourhood"), "bedrooms", record.get("bedrooms"), "bathrooms", record.get("bathrooms"), "beds", record.get("beds")));
-                }).onErrorContinue((throwable, record) -> {
-                    log.error("Error parcing document: {}", record, throwable);
-                });
+                }).onErrorContinue((throwable, record) -> log.error("Error parsing document: {}", record, throwable));
             } catch (Exception e) {
                 return Flux.empty();
             }
@@ -93,18 +93,17 @@ public class EtlCloudFunctions {
     @Bean
     Function<Flux<Document>, Flux<List<Document>>> documentTransformer() {
         return documentsFlux -> documentsFlux.map(document -> new TokenTextSplitter()
-                .apply(List.of(document)))
-                .onErrorContinue((throwable, document) -> {log.error("Error transforming document: {}", document, throwable);
-        }).subscribeOn(Schedulers.boundedElastic());
+                        .apply(List.of(document)))
+                .onErrorContinue((throwable, document) -> log.error("Error transforming document: {}", document, throwable)).subscribeOn(Schedulers.boundedElastic());
     }
 
     @Bean
     Consumer<Flux<List<Document>>> vectorStoreConsumer(VectorStore vectorStore) {
         return documentFlux -> documentFlux.flatMap(documents -> Flux
                 .fromIterable(documents)
-                .doOnNext(nextDocument -> {vectorStore
-                        .accept(List.of(nextDocument));})
-                        .onErrorContinue((throwable, document) -> {log.error("Error storing document: {}", document, throwable);})
+                .doOnNext(nextDocument -> vectorStore
+                        .accept(List.of(nextDocument)))
+                        .onErrorContinue((throwable, document) -> log.error("Error storing document: {}", document, throwable))
                 .collectList())
                 .subscribe();
     }
