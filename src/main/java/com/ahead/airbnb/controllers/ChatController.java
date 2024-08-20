@@ -5,7 +5,6 @@ import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +19,7 @@ public class ChatController {
     public ChatController(final ChatClient.Builder builder) {
         this.chatClient = builder.build();
         statefulChatClient = builder.defaultAdvisors(
-                        new MessageChatMemoryAdvisor(new InMemoryChatMemory(), "default", 10))
+                        new MessageChatMemoryAdvisor(new InMemoryChatMemory()))
                 .build();
     }
 
