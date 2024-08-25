@@ -107,7 +107,7 @@ This project demonstrates connecting to the Groq API too. You'll need to create 
 You need to export variables into your terminal or IDE runtime environment. The [docker-compose.yml](docker-compose.yml) and [application.yml](src%2Ftest%2Fresources%2Fapplication.yml) 
 files both need environment variables to be set.
 
-It's more convenient to run the variable exports inside a script file. Put the export statements in a file named `env.sh` 
+It's more convenient to run the variable exports inside a script file. Put the export statements in a file named `.env` 
 at the root of the project, like this:
 
 ```shell
@@ -119,14 +119,15 @@ export DATABASE_NAME=airbnb
 export OLLAMA_HOST=localhost
 export OPENAI_API_KEY=my-openai-api-key
 export GROK_API_KEY=my-grok-api-key
+echo "Environment variables set"
 ```
 
 Use any credentials you want for Postgres, plus the Groq and OpenAI API keys created above. The `gitignore` file already
-contains and entry for a file named `env.sh.` Use the ". ./env.sh" syntax on Mac or Linux to add the environment variables 
+contains and entry for a file named `.env.` Use the ". ./.env" syntax on Mac or Linux to add the environment variables 
 to the terminal session, as shown here:
 
 ```shell
-. ./env.sh
+. ./.env
 ```
 To run the application, tests, or `Docker Compose` from your IDE, add the environment variables inside the IDE runtime 
 configurations too. This screenshot shows the configuration for the JUnit tests in Intellij. Do the same 
@@ -141,7 +142,7 @@ because of the `spring-boot-docker-compose` library, but we want to do some hous
 Start `Docker Compose` from the root of the project as shown:
 
 ```shell
-. ./env.sh
+. ./.env
 docker compose up -d
 ```
 
@@ -279,7 +280,7 @@ You should now be able to execute the unit tests from your IDE, or from the comm
 environmental variables in your terminal or IDE runtime configuration first.
 
 ```shell
-. ./env.sh
+. ./.env
 mvn clean test
 ```
 
@@ -301,7 +302,7 @@ The default Maven profile is "ollama," and the default Spring profile is "llama3
 simply run `mvn spring-boot:run.`
 
 ```shell
-. ./env.sh
+. ./.env
 mvn spring-boot:run 
 ```
 The output should look like this:
@@ -311,14 +312,14 @@ The output should look like this:
 If you want to use OpenAI, then you must set the Maven profile to "openapi" and Spring profile to "gpt-4o."
 
 ```shell
-. ./env.sh
+. ./.env
 mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=gpt-4o"
 ```
 
 If you want to use Groq, then you must set the Maven profile to "openapi" and Spring profile to "groq."
 
 ```shell
-. ./env.sh
+. ./.env
 mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=groq"
 ```
 
@@ -409,7 +410,7 @@ public class ChatController {
 
 That is all you need to get started. Make sure the unit test runs, then start the project and use ChatGPT.
 
-1) Run `. ./env.sh`
+1) Run ` . ./.env`
 2) Run `mvn spring-boot:run`.
 2) Open http://localhost:8080?message=You are a Spring Developer Advocate. Tell me about Spring AI. Use HTML for the response.
 
