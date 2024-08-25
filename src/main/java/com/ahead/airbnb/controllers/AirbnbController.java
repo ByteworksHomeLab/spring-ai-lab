@@ -34,104 +34,101 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @RestController
 public class AirbnbController {
 
-    private static final Logger log = LoggerFactory.getLogger(AirbnbController.class);
+	private static final Logger log = LoggerFactory.getLogger(AirbnbController.class);
 
-    private final VectorStore vectorStore;
-    private final IngestionService ingestionService;
+	private final VectorStore vectorStore;
 
-    private final Resource listingsTemplateResource;
+	private final IngestionService ingestionService;
 
-    private PromptTemplate promptTemplate;
+	private final Resource listingsTemplateResource;
 
-    private final ChatModel chatModel;
+	private PromptTemplate promptTemplate;
 
-    private final ChatClient chatClient;
+	private final ChatModel chatModel;
 
-    public AirbnbController(final ChatModel chatModel,
-                            final ChatClient.Builder builder,
-                            final VectorStore vectorStore,
-                            final IngestionService ingestionService,
-                            @Value("classpath:/templates/listing.st") Resource listingsTemplateResource) {
-        this.chatModel = chatModel;
-        this.chatClient = builder.build();
-        this.vectorStore = vectorStore;
-        this.listingsTemplateResource = listingsTemplateResource;
-        this.ingestionService = ingestionService;
-        this.initPromptTemplate();
-    }
+	private final ChatClient chatClient;
 
-    public void initPromptTemplate() {
+	public AirbnbController(final ChatModel chatModel, final ChatClient.Builder builder, final VectorStore vectorStore,
+			final IngestionService ingestionService,
+			@Value("classpath:/templates/listing.st") Resource listingsTemplateResource) {
+		this.chatModel = chatModel;
+		this.chatClient = builder.build();
+		this.vectorStore = vectorStore;
+		this.listingsTemplateResource = listingsTemplateResource;
+		this.ingestionService = ingestionService;
+		this.initPromptTemplate();
+	}
 
-        try (Reader reader = new InputStreamReader(this.listingsTemplateResource.getInputStream(), UTF_8)) {
-            String template = FileCopyUtils.copyToString(reader);
-            this.promptTemplate = new PromptTemplate(template);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+	public void initPromptTemplate() {
 
-    }
+		try (Reader reader = new InputStreamReader(this.listingsTemplateResource.getInputStream(), UTF_8)) {
+			String template = FileCopyUtils.copyToString(reader);
+			this.promptTemplate = new PromptTemplate(template);
+		}
+		catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 
-    /**
-     * If you aren't using a GPU, this method may take a couple of minutes to return the result.
-     *
-     * @param message e.g. http://localhost:8080/prompt-stuffing?message=2%20bedroom%2c2%20bath%2cclose%20to%20downtown%20austin
-     * @return - A generated description based on your input that is similar to listings returned from the vector database.
-     */
-    @GetMapping("/prompt-stuffing")
-    public String promptStuffing(@RequestParam String message) {
-        log.info("promptStuffing() <- {}", message);
-        List<Document> documents = this.vectorStore.similaritySearch(message);
-        List<String> listings = new ArrayList<>();
-        for (Document document : documents) {
-            log.info(document.getFormattedContent());
-            listings.add(document.getContent());
-        }
-        log.info("promptStuffing() found {} similar results", documents.size());
-        SystemMessage systemMessage = new SystemMessage("""
-                    - Rewrite the user's Airbnb description using the information provided by the user in their prompt.
-                    - DO NOT change the number of rooms or number of bathrooms from the host's description.
-                    - When rewriting the user's description consider similar descriptions from the LISTINGS section.
-                    - Return your single best-rewritten description.
-                """);
-        Message userMessage = promptTemplate.createMessage(Map.of(
-                "input", message,
-                "listings", listings
-        ));
-        Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
-        return this.chatModel.call(prompt)
-                .getResult()
-                .getOutput()
-                .getContent();
-    }
+	}
 
-    /**
-     * If you aren't using a GPU, this method may take a couple of minutes to return the result.
-     * In a broswer:
-     * http://localhost:8080/rag?message=2%20bedroom%2c2%20bath%2cclose%20to%20downtown%20austin
-     *
-     * With httpie CLI:
-     * http ":8080/rag?message=2 bedroom 2 bath close to downtown"
-     * @param message - The host's listing description
-     * @return - A generated description based on your input that is similar to listings returned from the vector database.
-     */
-    @GetMapping("/rag")
-    public String rag(@RequestParam String message) {
-        log.info("rag() <- {}", message);
-        return this.chatClient.prompt()
-                .system("""
-                            - Rewrite the user's Airbnb description using the information provided by the user in their prompt.
-                            - DO NOT change the number of rooms or number of bathrooms from the host's description.
-                            - Return your single best-rewritten description.
-                        """)
-                .user(message)
-                .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults()))
-                .call()
-                .content(); // short for getResult().getOutput().getContent();
-    }
+	/**
+	 * If you aren't using a GPU, this method may take a couple of minutes to return the
+	 * result.
+	 * @param message e.g.
+	 * http://localhost:8080/prompt-stuffing?message=2%20bedroom%2c2%20bath%2cclose%20to%20downtown%20austin
+	 * @return - A generated description based on your input that is similar to listings
+	 * returned from the vector database.
+	 */
+	@GetMapping("/prompt-stuffing")
+	public String promptStuffing(@RequestParam String message) {
+		log.info("promptStuffing() <- {}", message);
+		List<Document> documents = this.vectorStore.similaritySearch(message);
+		List<String> listings = new ArrayList<>();
+		for (Document document : documents) {
+			log.info(document.getFormattedContent());
+			listings.add(document.getContent());
+		}
+		log.info("promptStuffing() found {} similar results", documents.size());
+		SystemMessage systemMessage = new SystemMessage("""
+				    - Rewrite the user's Airbnb description using the information provided by the user in their prompt.
+				    - DO NOT change the number of rooms or number of bathrooms from the host's description.
+				    - When rewriting the user's description consider similar descriptions from the LISTINGS section.
+				    - Return your single best-rewritten description.
+				""");
+		Message userMessage = promptTemplate.createMessage(Map.of("input", message, "listings", listings));
+		Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
+		return this.chatModel.call(prompt).getResult().getOutput().getContent();
+	}
 
-    @GetMapping("/run-ingestion")
-    public ResponseEntity<?> ingest() {
-        ingestionService.ingest();
-        return ResponseEntity.accepted().build();
-    }
+	/**
+	 * If you aren't using a GPU, this method may take a couple of minutes to return the
+	 * result. In a broswer:
+	 * http://localhost:8080/rag?message=2%20bedroom%2c2%20bath%2cclose%20to%20downtown%20austin
+	 *
+	 * With httpie CLI: http ":8080/rag?message=2 bedroom 2 bath close to downtown"
+	 * @param message - The host's listing description
+	 * @return - A generated description based on your input that is similar to listings
+	 * returned from the vector database.
+	 */
+	@GetMapping("/rag")
+	public String rag(@RequestParam String message) {
+		log.info("rag() <- {}", message);
+		return this.chatClient.prompt()
+			.system("""
+					    - Rewrite the user's Airbnb description using the information provided by the user in their prompt.
+					    - DO NOT change the number of rooms or number of bathrooms from the host's description.
+					    - Return your single best-rewritten description.
+					""")
+			.user(message)
+			.advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults()))
+			.call()
+			.content(); // short for getResult().getOutput().getContent();
+	}
+
+	@GetMapping("/run-ingestion")
+	public ResponseEntity<?> ingest() {
+		ingestionService.ingest();
+		return ResponseEntity.accepted().build();
+	}
+
 }

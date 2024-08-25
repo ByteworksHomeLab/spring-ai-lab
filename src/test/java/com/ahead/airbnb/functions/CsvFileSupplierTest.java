@@ -1,4 +1,5 @@
 package com.ahead.airbnb.functions;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -27,59 +28,62 @@ import static org.mockito.Mockito.when;
 @Testcontainers
 public class CsvFileSupplierTest {
 
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("pgvector/pgvector:pg16");
+	@Container
+	@ServiceConnection
+	static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("pgvector/pgvector:pg16");
 
-    @InjectMocks
-    private EtlCloudFunctions etlCloudFunctions;
+	@InjectMocks
+	private EtlCloudFunctions etlCloudFunctions;
 
-    @Mock
-    private ClassPathResource mockResource;
+	@Mock
+	private ClassPathResource mockResource;
 
-    private final String csvContent = "id,listing_url,name,description,price,bathrooms,bedrooms,beds,property_type\n" +
-            "1,http://example.com/listing/1,Sample Name,Sample Description,100,1,2,3,Apartment\n" +
-            "2,http://example.com/listing/2,Another Name,Another Description,200,2,3,4,House\n";
+	private final String csvContent = "id,listing_url,name,description,price,bathrooms,bedrooms,beds,property_type\n"
+			+ "1,http://example.com/listing/1,Sample Name,Sample Description,100,1,2,3,Apartment\n"
+			+ "2,http://example.com/listing/2,Another Name,Another Description,200,2,3,4,House\n";
 
-    @BeforeEach
-    void setUp() throws IOException {
-        MockitoAnnotations.openMocks(this);
+	@BeforeEach
+	void setUp() throws IOException {
+		MockitoAnnotations.openMocks(this);
 
-        // Mocking the resource to return the CSV content
-        when(mockResource.exists()).thenReturn(true);
-        when(mockResource.getInputStream()).thenReturn(new ByteArrayInputStream(csvContent.getBytes(StandardCharsets.UTF_8)));
-    }
+		// Mocking the resource to return the CSV content
+		when(mockResource.exists()).thenReturn(true);
+		when(mockResource.getInputStream())
+			.thenReturn(new ByteArrayInputStream(csvContent.getBytes(StandardCharsets.UTF_8)));
+	}
 
-    @Test
-    public void testCsvFileSupplier() {
-        Supplier<Flux<byte[]>> csvFileSupplier = () -> {
-            try {
-                if (!mockResource.exists()) {
-                    return Flux.empty();
-                }
+	@Test
+	public void testCsvFileSupplier() {
+		Supplier<Flux<byte[]>> csvFileSupplier = () -> {
+			try {
+				if (!mockResource.exists()) {
+					return Flux.empty();
+				}
 
-                try (InputStreamReader reader = new InputStreamReader(mockResource.getInputStream(), StandardCharsets.UTF_8);
-                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+				try (InputStreamReader reader = new InputStreamReader(mockResource.getInputStream(),
+						StandardCharsets.UTF_8); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
-                    char[] buffer = new char[1024];
-                    int bytesRead;
-                    while ((bytesRead = reader.read(buffer)) != -1) {
-                        outputStream.write(new String(buffer, 0, bytesRead).getBytes(StandardCharsets.UTF_8));
-                    }
+					char[] buffer = new char[1024];
+					int bytesRead;
+					while ((bytesRead = reader.read(buffer)) != -1) {
+						outputStream.write(new String(buffer, 0, bytesRead).getBytes(StandardCharsets.UTF_8));
+					}
 
-                    byte[] byteArray = outputStream.toByteArray();
-                    return Flux.just(byteArray);
-                }
+					byte[] byteArray = outputStream.toByteArray();
+					return Flux.just(byteArray);
+				}
 
-            } catch (IOException e) {
-                return Flux.empty();
-            }
-        };
+			}
+			catch (IOException e) {
+				return Flux.empty();
+			}
+		};
 
-        // Use StepVerifier to test the results
-        StepVerifier.create(csvFileSupplier.get())
-                .assertNext(bytes -> assertArrayEquals(csvContent.getBytes(StandardCharsets.UTF_8), bytes))
-                .verifyComplete();
+		// Use StepVerifier to test the results
+		StepVerifier.create(csvFileSupplier.get())
+			.assertNext(bytes -> assertArrayEquals(csvContent.getBytes(StandardCharsets.UTF_8), bytes))
+			.verifyComplete();
 
-    }
+	}
+
 }

@@ -23,44 +23,46 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Testcontainers
 public class CsvReaderTest {
 
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("pgvector/pgvector:pg16");
+	@Container
+	@ServiceConnection
+	static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("pgvector/pgvector:pg16");
 
+	@Value("classpath:/test-listings.csv")
+	private Resource listingsCSVResource;
 
-    @Value("classpath:/test-listings.csv")
-    private Resource listingsCSVResource;
+	@Autowired
+	private Function<Flux<byte[]>, Flux<Document>> csvReader;
 
-    @Autowired
-    private Function<Flux<byte[]>, Flux<Document>> csvReader;
+	@Test
+	public void testFunctionCsvReader() throws IOException {
+		// Create sample input documents
+		InputStream inputStream = listingsCSVResource.getInputStream();
+		Flux<byte[]> byteFlux = Flux.just(inputStream.readAllBytes());
+		Function<Flux<byte[]>, Flux<Document>> csvReaderFunction = csvReader;
+		Flux<Document> resultFlux = csvReaderFunction.apply(byteFlux);
+		StepVerifier.create(resultFlux).assertNext(document -> {
+			assertEquals(
+					"Walk to 6th, Rainey St and Convention Ctr - Great central  location for walking to Convention Center, Rainey Street, East 6th Street, Downtown, Congress Ave Bats.<br /><br />  Free wifi<br /><br />No Smoking,  No pets",
+					document.getContent());
+			assertEquals(5456L, document.getMetadata().get("id"));
+			assertEquals("Walk to 6th, Rainey St and Convention Ctr", document.getMetadata().get("name"));
+			assertEquals(
+					"Great central  location for walking to Convention Center, Rainey Street, East 6th Street, Downtown, Congress Ave Bats.<br /><br />  Free wifi<br /><br />No Smoking,  No pets",
+					document.getMetadata().get("description"));
+			assertEquals("https://www.airbnb.com/rooms/5456", document.getMetadata().get("listingUrl"));
+			assertEquals("$108.00", document.getMetadata().get("price"));
+			assertEquals("Entire guesthouse", document.getMetadata().get("propertyType"));
+		}).assertNext(document -> {
+			assertEquals("NW Austin Room - ", document.getContent()); // Description is
+																		// blank
+			assertEquals(5769L, document.getMetadata().get("id"));
+			assertEquals("NW Austin Room", document.getMetadata().get("name"));
+			assertEquals("", document.getMetadata().get("description"));
+			assertEquals("https://www.airbnb.com/rooms/5769", document.getMetadata().get("listingUrl"));
+			assertEquals("$48.00", document.getMetadata().get("price"));
+			assertEquals("Private room in home", document.getMetadata().get("propertyType"));
+		}).verifyComplete();
 
-    @Test
-    public void testFunctionCsvReader() throws IOException {
-        // Create sample input documents
-        InputStream inputStream = listingsCSVResource.getInputStream();
-        Flux<byte[]> byteFlux = Flux.just(inputStream.readAllBytes());
-        Function<Flux<byte[]>, Flux<Document>> csvReaderFunction = csvReader;
-        Flux<Document> resultFlux = csvReaderFunction.apply(byteFlux);
-        StepVerifier.create(resultFlux)
-                .assertNext(document -> {
-                    assertEquals("Walk to 6th, Rainey St and Convention Ctr - Great central  location for walking to Convention Center, Rainey Street, East 6th Street, Downtown, Congress Ave Bats.<br /><br />  Free wifi<br /><br />No Smoking,  No pets", document.getContent());
-                    assertEquals(5456L, document.getMetadata().get("id"));
-                    assertEquals("Walk to 6th, Rainey St and Convention Ctr", document.getMetadata().get("name"));
-                    assertEquals("Great central  location for walking to Convention Center, Rainey Street, East 6th Street, Downtown, Congress Ave Bats.<br /><br />  Free wifi<br /><br />No Smoking,  No pets", document.getMetadata().get("description"));
-                    assertEquals("https://www.airbnb.com/rooms/5456", document.getMetadata().get("listingUrl"));
-                    assertEquals("$108.00", document.getMetadata().get("price"));
-                    assertEquals("Entire guesthouse", document.getMetadata().get("propertyType"));
-                })
-                .assertNext(document -> {
-                    assertEquals("NW Austin Room - ", document.getContent()); // Description is blank
-                    assertEquals(5769L, document.getMetadata().get("id"));
-                    assertEquals("NW Austin Room", document.getMetadata().get("name"));
-                    assertEquals("", document.getMetadata().get("description"));
-                    assertEquals("https://www.airbnb.com/rooms/5769", document.getMetadata().get("listingUrl"));
-                    assertEquals("$48.00", document.getMetadata().get("price"));
-                    assertEquals("Private room in home", document.getMetadata().get("propertyType"));
-                }).verifyComplete();
+	}
 
-    }
 }
-
