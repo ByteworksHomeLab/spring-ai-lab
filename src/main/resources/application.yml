@@ -21,6 +21,9 @@ spring:
     compose:
       file: ./docker-compose.yml
       lifecycle-management: start_only
+logging:
+  level:
+    springframework.web.client: DEBUG
 ---
 spring:
   config:
