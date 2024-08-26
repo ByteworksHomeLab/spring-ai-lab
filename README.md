@@ -117,7 +117,7 @@ export DB_HOST=localhost
 export DATABASE_NAME=airbnb
 export OLLAMA_HOST=localhost
 export OPENAI_API_KEY=my-openai-api-key
-export GROK_API_KEY=my-grok-api-key
+export GROQ_API_KEY=my-grok-api-key
 ```
 
 Use any credentials you want for Postgres, plus the Groq and OpenAI API keys created above. The `gitignore` file already
