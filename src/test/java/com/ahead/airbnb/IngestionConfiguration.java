@@ -43,7 +43,7 @@ public class IngestionConfiguration {
 					doc.getMetadata().put("category", "module");
 					doc.getMetadata().put("project", "testcontainers");
 					doc.getMetadata().put("module", "ollama");
-                })
+				})
 				.toList();
 			vectorStore.add(javaDocuments);
 			vectorStore.add(ollamaJavaDocuments);

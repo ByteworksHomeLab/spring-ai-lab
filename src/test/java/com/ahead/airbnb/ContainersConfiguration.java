@@ -1,17 +1,17 @@
 package com.ahead.airbnb;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.model.Image;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.devtools.restart.RestartScope;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.ollama.OllamaContainer;
 import org.testcontainers.utility.DockerImageName;
-import com.github.dockerjava.api.model.Image;
-import org.testcontainers.DockerClientFactory;
 
 import java.io.IOException;
 import java.util.List;
