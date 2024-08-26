@@ -1,7 +1,7 @@
 services:
   ollama:
     container_name: ollama
-    image: ollama/ollama
+    image: stevecmitchell/ollama-llama31-all-minilm:1.0.0
     ports:
       - 11434:11434
     restart: always

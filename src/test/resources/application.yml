@@ -19,4 +19,9 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-
+  docker:
+    compose:
+      file: ./docker-compose.yml
+      lifecycle-management: start_and_stop
+      skip:
+        in-tests: false
