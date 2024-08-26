@@ -111,7 +111,6 @@ It's more convenient to run the variable exports inside a script file. Put the e
 at the root of the project, like this:
 
 ```shell
-#!/bin/bash
 export DB_USER=my-postgres-username
 export DB_PASSWORD=my-postgres-password
 export DB_HOST=localhost
@@ -119,7 +118,6 @@ export DATABASE_NAME=airbnb
 export OLLAMA_HOST=localhost
 export OPENAI_API_KEY=my-openai-api-key
 export GROK_API_KEY=my-grok-api-key
-echo "Environment variables set"
 ```
 
 Use any credentials you want for Postgres, plus the Groq and OpenAI API keys created above. The `gitignore` file already
