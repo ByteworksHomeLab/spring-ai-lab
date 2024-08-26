@@ -20,10 +20,6 @@ import java.util.function.Function;
 @Testcontainers
 public class DocumentTransformerTest {
 
-	@Container
-	@ServiceConnection
-	static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("pgvector/pgvector:pg16");
-
 	@Autowired
 	private Function<Flux<Document>, Flux<List<Document>>> documentTransformer;
 

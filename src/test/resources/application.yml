@@ -14,4 +14,9 @@ spring:
       embedding:
         enabled: true
         model: all-minilm
+    vectorstore:
+      pgvector:
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 384
 

@@ -23,11 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Testcontainers
 public class CsvReaderTest {
 
-	@Container
-	@ServiceConnection
-	static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("pgvector/pgvector:pg16");
-
-	@Value("classpath:/test-listings.csv")
+	@Value("classpath:/data/test-listings.csv")
 	private Resource listingsCSVResource;
 
 	@Autowired

@@ -1,0 +1,5 @@
+QUESTION
+{question}
+
+DOCUMENTS
+{documents}

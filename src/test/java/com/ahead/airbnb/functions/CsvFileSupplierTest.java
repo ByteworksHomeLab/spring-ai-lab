@@ -28,10 +28,6 @@ import static org.mockito.Mockito.when;
 @Testcontainers
 public class CsvFileSupplierTest {
 
-	@Container
-	@ServiceConnection
-	static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("pgvector/pgvector:pg16");
-
 	@InjectMocks
 	private EtlCloudFunctions etlCloudFunctions;
 
