@@ -20,12 +20,11 @@ More detailed information is available in the following chapters:
 5) [Vector Embedding](src%2Fmain%2Fresources%2Fstatic%2Fdocs%2F5-Vector-Embedding.md)
 
 # QUICK START
-You should now be able to execute the unit tests from your IDE, or from the command line. Be sure to export the 
-environmental variables in your terminal or IDE runtime configuration first.
+If you don't want to read the detailed instructions, here is a quick start guide.
 
-## Put the Environment Variables at the Root of the Project in a file named '.env'.
+## Store your Environment Variables
 
-Create a file named `.env` like that shown below. Pick whatever you want for the database user and password.
+Create a file named `.env` at the root of this project like that shown below. Pick whatever you want for the database user and password.
 Sign up for API keys from OpenAI and Groq. 
 
 ```shell
@@ -39,6 +38,8 @@ export GROQ_API_KEY=my-grok-api-key
 ```
 
 ## Run the Unit Tests
+Verify that everything is working by running the unit tests.
+
 ```shell
 . ./.env
 mvn clean test
@@ -48,7 +49,7 @@ mvn clean test
 
 Spring Boot needs the environment variables exported to in the terminal or added to your IDE's runtime configuration. 
 Once the environment variables are exported, `spring-boot-docker-compose` automatically brings up Docker Compose whenever 
-Spring Boot is run.
+Spring Boot is started.
 
 ### Picking Maven and Spring Profiles to Run
 
@@ -76,5 +77,75 @@ mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.a
 
 # Try out some Spring AI Features
 
-With 
+## Call the GPT-4o with Spring AI
 
+Start Spring Boot with the `openai` Maven profile and the `gpt-4o` Spring profile.  
+```shell
+. ./.env
+mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=gpt-4o"
+```
+
+Use Spring AI to call the GPT-4o model. 
+```shell
+http ":8080/chat?message=Tell me a dad joke about animals?"
+```
+
+## Call Groq with Spring AI
+
+Restart Spring Boot with the `openai` Maven profile and the `groq` Spring profile.
+```shell
+. ./.env
+mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=groq"
+```
+Use Spring AI to call the Groq model.
+```shell
+http ":8080/chat?message=Tell me a dad joke about animals?"
+```
+
+## Call Llama3 running locally on Ollama
+
+Start Spring Boot with the default profiles, `ollama` Maven profile and the `llama3` Spring profile.
+```shell
+. ./.env
+mvn spring-boot:run
+```
+
+Use Spring AI to call the Llama3 model running locally on Ollama.
+```shell
+http ":8080/chat?message=When did the Apple II come out"
+```
+
+## Rewrite an Airbnb Listing Description using RAG
+
+This one takes a little setup. First, you need to load the Airbnb CSV file into the vector store.
+The process takes about 50 minutes, depending on your machine. Start Spring Boot if it is not already running.
+
+```shell
+. ./.env
+mvn spring-boot:run
+```
+
+Next, kick off the embedding process.
+
+```shell
+http ":8080/run-ingestion"
+```
+You can monitor its process by checking the console logs. When it is done, you can call the RAG model.
+
+```shell
+http ":8080/rag?message=2-bedroom 2-bathroom close to downtown Austin"
+```
+
+It may take more than two minutes to complete if you are running on a laptop, less time if you are on a machine with a GPU.
+
+## Hold Conversational State
+
+For this example, you may use any of the LLMs shown above, gpt-4o, groq, or llama3. You need to ask a question that 
+requires a follow-up question. The key is to use the `chatId` parameter to hold the conversational state. 
+
+Here we ask when the Apple II came out and then ask what other computers came out that year. The second question is 
+dependent on the first question because it assumes that the LLE knows we are talking about the year that the Apple II came out.
+```shell
+http ":8080/conversation?message=When did the Apple II come out?&chatId=1234"
+http ":8080/conversation?message=What other computers came out that year?&chatId=1234"
+```
