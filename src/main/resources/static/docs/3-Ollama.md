@@ -1,5 +1,5 @@
 # Ollama
-[Previous](2-Requirements.md)
+[Previous](2-Requirements.md) | [Next](4-Spring-AI.md)
 
 In the [Requirements](2-Requirements.md) section, you launched Docker Compose with Ollama. It is running my custom image, 
 `stevecmitchell/ollama-llama31-all-minilm:1.0.0`. My custom image already has the Llama 3.1 LLM installed along with the `all-minilm` embedding model.
@@ -114,4 +114,4 @@ DROP TABLE vector_store;
 You don't need to recreate the vector storage table. Spring Boot AI recreates the vector database the next time you
 do a `mvn spring-boot-run` based on the application properties above.
 
-[Previous](2-Requirements.md)
+[Previous](2-Requirements.md) | [Next](4-Spring-AI.md)
