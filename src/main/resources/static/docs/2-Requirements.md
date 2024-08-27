@@ -34,7 +34,7 @@ Ollama is also defined in the `docker-compose.yaml` file at the root of the proj
 services:
   ollama:
     container_name: ollama
-    image: stevecmitchell/ollama-llama31-all-minilm:1.0.0
+    image: stevecmitchell/ollama-llama31-all-minilm:1.0.1
 ```
 
 Notice we are not using the standard ollama/ollama image. Instead, we are using a custom image that includes the llama 3.1 model and the all-minilm embedding model.
@@ -102,7 +102,7 @@ docker compose ps
 
 docker compose ps
 NAME       IMAGE                                            COMMAND                  SERVICE    CREATED          STATUS          PORTS
-ollama     stevecmitchell/ollama-llama31-all-minilm:1.0.0   "/bin/ollama serve"      ollama     19 minutes ago   Up 22 seconds   0.0.0.0:11434->11434/tcp
+ollama     stevecmitchell/ollama-llama31-all-minilm:1.0.1   "/bin/ollama serve"      ollama     19 minutes ago   Up 22 seconds   0.0.0.0:11434->11434/tcp
 postgres   pgvector/pgvector:pg16                           "docker-entrypoint.s…"   postgres   2 hours ago      Up 22 seconds   0.0.0.0:5432->5432/tcp
 ```
 

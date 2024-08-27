@@ -2,7 +2,7 @@
 [Previous](2-Requirements.md) | [Next](4-Spring-AI.md)
 
 In the [Requirements](2-Requirements.md) section, you launched Docker Compose with Ollama. It is running my custom image, 
-`stevecmitchell/ollama-llama31-all-minilm:1.0.0`. My custom image already has the Llama 3.1 LLM installed along with the `all-minilm` embedding model.
+`stevecmitchell/ollama-llama31-all-minilm:1.0.1`. My custom image already has the Llama 3.1 LLM installed along with the `all-minilm` embedding model.
 
 The following steps discuss how that image was build using the standard `ollama/ollama` image from Docker Hub.
 
