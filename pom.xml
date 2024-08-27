@@ -20,6 +20,7 @@
 		<spring-cloud.version>2023.0.3</spring-cloud.version>
 		<spring-cloud-fn.version>5.0.0</spring-cloud-fn.version>
 		<testcontainers.version>1.20.1</testcontainers.version>
+		<spring-doc.version>2.6.0</spring-doc.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -62,6 +63,11 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-pdf-document-reader</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>${spring-doc.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -77,6 +77,10 @@ mvn -Popenai spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.a
 
 # Try out some Spring AI Features
 
+Let's exercise the application's endpoints to demonstrate the features of Spring AI. Here is the [Swagger page](http://localhost:8080/swagger-ui/index.html#/).
+
+[![Swagger.png](src%2Fmain%2Fresources%2Fstatic%2FSwagger.png)](http://localhost:8080/swagger-ui/index.html#/)
+
 ## Call the GPT-4o with Spring AI
 
 Start Spring Boot with the `openai` Maven profile and the `gpt-4o` Spring profile.  
