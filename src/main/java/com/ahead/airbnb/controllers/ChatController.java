@@ -5,6 +5,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatController {
 
 	private final ChatClient chatClient;
+	private final ChatModel chatModel;
 
 	private final ChatClient statefulChatClient;
 
@@ -25,9 +27,12 @@ public class ChatController {
 	 * Constructor for ChatController.
 	 *
 	 * @param builder the chat client builder
+	 * @param chatModel the chat model
 	 */
-	public ChatController(final ChatClient.Builder builder) {
+	public ChatController(final ChatClient.Builder builder,
+						  final ChatModel chatModel) {
 		this.chatClient = builder.build();
+		this.chatModel = chatModel;
 		statefulChatClient = builder.defaultAdvisors(new MessageChatMemoryAdvisor(new InMemoryChatMemory())).build();
 	}
 
@@ -42,7 +47,7 @@ public class ChatController {
 	@Operation(summary = "Get a single response from the LLM without holding state of the conversation")
 	@GetMapping("/chat")
 	@ResponseStatus(HttpStatus.OK)
-	public String getstatelessChat(@RequestParam(value = "message") String message) {
+	public String getStatelessChat(@RequestParam(value = "message") String message) {
 		return chatClient.prompt().user(message).call().content(); // short for
 																	// getResult().getOutput().getContent();
 	}
