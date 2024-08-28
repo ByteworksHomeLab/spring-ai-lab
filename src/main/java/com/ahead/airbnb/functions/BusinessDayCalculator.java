@@ -47,6 +47,13 @@ public class BusinessDayCalculator {
         return holidays;
     }
 
+    /**
+     * Calculates the previous U.S. government business day for a given date.
+     * A business day is defined as a weekday that is not a federal holiday.
+     *
+     * @param date the date for which to find the previous business day
+     * @return the previous U.S. government business day
+     */
     public static LocalDate getPreviousUSGovernmentBusinessDay(LocalDate date) {
         LocalDate previousBusinessDay = date.minusDays(1);
 

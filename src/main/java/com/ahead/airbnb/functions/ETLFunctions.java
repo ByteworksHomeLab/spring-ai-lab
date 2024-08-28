@@ -21,6 +21,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+/**
+ * Configuration class for ETL (Extract, Transform, Load) functions.
+ */
 @Configuration
 public class ETLFunctions {
 
@@ -29,6 +32,13 @@ public class ETLFunctions {
 	private final String[] headers = { "id", "listing_url", "name", "description", "neighbourhood", "property_type",
 			"bathrooms", "bedrooms", "beds", "price", };
 
+	/**
+	 * Extracts a Long value from a CSV record for a given column name.
+	 *
+	 * @param record the CSV record
+	 * @param columnName the column name
+	 * @return the Long value, or null if parsing fails
+	 */
 	public static Long getLong(CSVRecord record, String columnName) {
 		if (record != null && columnName != null) {
 			String value = record.get(columnName);
@@ -44,6 +54,11 @@ public class ETLFunctions {
 		return null;
 	}
 
+	/**
+	 * Supplies a Flux of byte arrays representing the contents of a CSV file.
+	 *
+	 * @return a Supplier of Flux<byte[]>
+	 */
 	@Bean
 	public Supplier<Flux<byte[]>> csvFileSupplier() {
 		return () -> {
@@ -72,6 +87,11 @@ public class ETLFunctions {
 		};
 	}
 
+	/**
+	 * Reads CSV data from a Flux of byte arrays and converts it to a Flux of Document objects.
+	 *
+	 * @return a Function that transforms Flux<byte[]> to Flux<Document>
+	 */
 	@Bean
 	public Function<Flux<byte[]>, Flux<Document>> csvReader() {
 		return byteFlux -> byteFlux.publishOn(Schedulers.boundedElastic()).flatMap(bytes -> {
@@ -100,6 +120,11 @@ public class ETLFunctions {
 		});
 	}
 
+	/**
+	 * Transforms a Flux of Document objects into a Flux of Lists of Document objects.
+	 *
+	 * @return a Function that transforms Flux<Document> to Flux<List<Document>>
+	 */
 	@Bean
 	Function<Flux<Document>, Flux<List<Document>>> documentTransformer() {
 		return documentsFlux -> documentsFlux.map(document -> new TokenTextSplitter().apply(List.of(document)))
@@ -107,6 +132,12 @@ public class ETLFunctions {
 			.subscribeOn(Schedulers.boundedElastic());
 	}
 
+	/**
+	 * Consumes a Flux of Lists of Document objects and stores them in a VectorStore.
+	 *
+	 * @param vectorStore the VectorStore to store the documents
+	 * @return a Consumer that processes Flux<List<Document>>
+	 */
 	@Bean
 	Consumer<Flux<List<Document>>> vectorStoreConsumer(VectorStore vectorStore) {
 		return documentFlux -> documentFlux

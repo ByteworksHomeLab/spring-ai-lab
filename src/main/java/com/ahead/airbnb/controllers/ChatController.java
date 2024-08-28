@@ -1,13 +1,19 @@
 package com.ahead.airbnb.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller for handling Airbnb-related operations.
+ */
 @RestController
 public class ChatController {
 
@@ -15,6 +21,11 @@ public class ChatController {
 
 	private final ChatClient statefulChatClient;
 
+	/**
+	 * Constructor for ChatController.
+	 *
+	 * @param builder the chat client builder
+	 */
 	public ChatController(final ChatClient.Builder builder) {
 		this.chatClient = builder.build();
 		statefulChatClient = builder.defaultAdvisors(new MessageChatMemoryAdvisor(new InMemoryChatMemory())).build();
@@ -28,7 +39,9 @@ public class ChatController {
 	 * @param message - Input your question for the LLM to answer
 	 * @return The answer to your question.
 	 */
+	@Operation(summary = "Get a single response from the LLM without holding state of the conversation")
 	@GetMapping("/chat")
+	@ResponseStatus(HttpStatus.OK)
 	public String getstatelessChat(@RequestParam(value = "message") String message) {
 		return chatClient.prompt().user(message).call().content(); // short for
 																	// getResult().getOutput().getContent();
@@ -46,7 +59,9 @@ public class ChatController {
 	 * @param message - Input your question for the LLM to answer
 	 * @return The answer to your question.
 	 */
+	@Operation(summary = "Get a conversation response from the LLM by holding the state of a conversation in memory.")
 	@GetMapping("/conversation")
+	@ResponseStatus(HttpStatus.OK)
 	public String conversation(@RequestParam(value = "message") String message,
 			@RequestParam(defaultValue = "default") String chatId) {
 		return statefulChatClient.prompt()

@@ -19,11 +19,20 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.function.Function;
 
+/**
+ * Configuration class for National Debt related functions.
+ * */
 @Configuration
 public class NationalDebtFunctions {
 
 	private static final Logger log = LoggerFactory.getLogger(NationalDebtFunctions.class);
 
+	/**
+	 * Bean that defines a function to fetch and sum the national debt from a given API.
+	 *
+	 * @param webClientFromBuilder the WebClient.Builder to build the WebClient
+	 * @return a Function that takes a Mono<String> and returns a Mono<NationalDebtRecord>
+	 */
 	@Bean
 	public Function<Mono<String>, Mono<NationalDebtRecord>> debtSumFunction(WebClient.Builder webClientFromBuilder) {
 		LocalDate lastBusinessDay = BusinessDayCalculator.getPreviousUSGovernmentBusinessDay(LocalDate.now());
