@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 public class CsvFileSupplierTest {
 
 	@InjectMocks
-	private EtlCloudFunctions etlCloudFunctions;
+	private ETLFunctions ETLFunctions;
 
 	@Mock
 	private ClassPathResource mockResource;

@@ -22,9 +22,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Configuration
-public class EtlCloudFunctions {
+public class ETLFunctions {
 
-	private static final Logger log = LoggerFactory.getLogger(EtlCloudFunctions.class);
+	private static final Logger log = LoggerFactory.getLogger(ETLFunctions.class);
 
 	private final String[] headers = { "id", "listing_url", "name", "description", "neighbourhood", "property_type",
 			"bathrooms", "bedrooms", "beds", "price", };
@@ -84,7 +84,7 @@ public class EtlCloudFunctions {
 					String name = record.get("name");
 					String description = record.get("description");
 					return new Document(name + " - " + description,
-							Map.of("id", EtlCloudFunctions.getLong(record, "id"), "name", name, "description",
+							Map.of("id", ETLFunctions.getLong(record, "id"), "name", name, "description",
 									description, "listingUrl", record.get("listing_url"), "price", record.get("price"),
 									"propertyType", record.get("property_type"), "neighborhood",
 									record.get("neighbourhood"), "bedrooms", record.get("bedrooms"), "bathrooms",
