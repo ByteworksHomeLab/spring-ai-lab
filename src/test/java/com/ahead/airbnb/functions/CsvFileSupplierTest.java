@@ -2,7 +2,6 @@ package com.ahead.airbnb.functions;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,9 +21,6 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class CsvFileSupplierTest {
-
-	@InjectMocks
-	private ETLFunctions ETLFunctions;
 
 	@Mock
 	private ClassPathResource mockResource;

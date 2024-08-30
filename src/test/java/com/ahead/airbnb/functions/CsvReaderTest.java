@@ -26,7 +26,6 @@ public class CsvReaderTest {
 
 	@Test
 	public void testFunctionCsvReader() throws IOException {
-		// Create sample input documents
 		InputStream inputStream = listingsCSVResource.getInputStream();
 		Flux<byte[]> byteFlux = Flux.just(inputStream.readAllBytes());
 		Function<Flux<byte[]>, Flux<Document>> csvReaderFunction = csvReader;

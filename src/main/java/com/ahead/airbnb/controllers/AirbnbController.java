@@ -2,16 +2,13 @@ package com.ahead.airbnb.controllers;
 
 import com.ahead.airbnb.services.IngestionService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
-import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,9 +25,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -56,7 +50,6 @@ public class AirbnbController {
 
 	/**
 	 * Constructor for AirbnbController.
-	 *
 	 * @param chatModel the chat model to use
 	 * @param builder the chat client builder
 	 * @param vectorStore the vector store for similarity search
@@ -71,14 +64,13 @@ public class AirbnbController {
 		this.vectorStore = vectorStore;
 		this.listingsTemplateResource = listingsTemplateResource;
 		this.ingestionService = ingestionService;
-		this.initPromptTemplate();
 	}
 
 	/**
 	 * Initializes the prompt template by reading the template from the resource.
 	 */
+	@PostConstruct
 	public void initPromptTemplate() {
-
 		try (Reader reader = new InputStreamReader(this.listingsTemplateResource.getInputStream(), UTF_8)) {
 			String template = FileCopyUtils.copyToString(reader);
 			this.promptTemplate = new PromptTemplate(template);
@@ -91,37 +83,6 @@ public class AirbnbController {
 
 	/**
 	 * If you aren't using a GPU, this method may take a couple of minutes to return the
-	 * result.
-	 * @param message the user's input message
-	 * http://localhost:8080/prompt-stuffing?message=2%20bedroom%2c2%20bath%2cclose%20to%20downtown%20austin
-	 * @return - A generated description based on your input that is similar to listings
-	 * returned from the vector database.
-	 */
-	@Operation(summary = "The user provides a description of a listing and the system uses prompt stuffing to generate a similar description based on the user's input and the listings in the database.")
-	@GetMapping("/prompt-stuffing")
-	@ResponseStatus(HttpStatus.OK)
-	public String promptStuffing(@RequestParam String message) {
-		log.info("promptStuffing() <- {}", message);
-		List<Document> documents = this.vectorStore.similaritySearch(message);
-		List<String> listings = new ArrayList<>();
-		for (Document document : documents) {
-			log.info(document.getFormattedContent());
-			listings.add(document.getContent());
-		}
-		log.info("promptStuffing() found {} similar results", documents.size());
-		SystemMessage systemMessage = new SystemMessage("""
-				    - Rewrite the user's Airbnb description using the information provided by the user in their prompt.
-				    - DO NOT change the number of rooms or number of bathrooms from the host's description.
-				    - When rewriting the user's description consider similar descriptions from the LISTINGS section.
-				    - Return your single best-rewritten description.
-				""");
-		Message userMessage = promptTemplate.createMessage(Map.of("input", message, "listings", listings));
-		Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
-		return this.chatModel.call(prompt).getResult().getOutput().getContent();
-	}
-
-	/**
-	 * If you aren't using a GPU, this method may take a couple of minutes to return the
 	 * result. In a broswer:
 	 * http://localhost:8080/rag?message=2%20bedroom%2c2%20bath%2cclose%20to%20downtown%20austin
 	 *
@@ -130,7 +91,8 @@ public class AirbnbController {
 	 * @return - A generated description based on your input that is similar to listings
 	 * returned from the vector database.
 	 */
-	@Operation(summary = "The user provides a description of a listing and the system uses the RAG model to generate a similar description based on the user's input and the listings in the database.")
+	@Operation(
+			summary = "The user provides a description of a listing and the system uses the RAG model to generate a similar description based on the user's input and the listings in the database.")
 	@GetMapping("/rag")
 	@ResponseStatus(HttpStatus.OK)
 	public String rag(@RequestParam String message) {
@@ -148,8 +110,8 @@ public class AirbnbController {
 	}
 
 	/**
-	 * Ingests data from the Airbnb CSV file into the vector store. This process runs for about an hour.
-	 *
+	 * Ingests data from the Airbnb CSV file into the vector store. This process runs for
+	 * about an hour.
 	 * @return a response entity indicating the ingestion process has started
 	 */
 	@Operation(summary = "Ingest data from the Airbnb CSV file into the vector store. It runs for about an hour.")

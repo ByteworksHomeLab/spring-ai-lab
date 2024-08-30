@@ -13,7 +13,6 @@ public class IngestionService {
 
 	/**
 	 * Constructs an IngestionService with the given FunctionCatalog.
-	 *
 	 * @param catalog the FunctionCatalog to use for function lookup
 	 */
 	public IngestionService(final FunctionCatalog catalog) {

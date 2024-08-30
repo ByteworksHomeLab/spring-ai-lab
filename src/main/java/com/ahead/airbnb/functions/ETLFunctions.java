@@ -34,10 +34,9 @@ public class ETLFunctions {
 
 	/**
 	 * Extracts a Long value from a CSV record for a given column name.
-	 *
 	 * @param record the CSV record
 	 * @param columnName the column name
-	 * @return the Long value, or null if parsing fails
+	 * @return the Long value, or zero if parsing fails
 	 */
 	public static Long getLong(CSVRecord record, String columnName) {
 		if (record != null && columnName != null) {
@@ -51,12 +50,11 @@ public class ETLFunctions {
 				}
 			}
 		}
-		return null;
+		return 0L;
 	}
 
 	/**
 	 * Supplies a Flux of byte arrays representing the contents of a CSV file.
-	 *
 	 * @return a Supplier of Flux<byte[]>
 	 */
 	@Bean
@@ -88,8 +86,8 @@ public class ETLFunctions {
 	}
 
 	/**
-	 * Reads CSV data from a Flux of byte arrays and converts it to a Flux of Document objects.
-	 *
+	 * Reads CSV data from a Flux of byte arrays and converts it to a Flux of Document
+	 * objects.
 	 * @return a Function that transforms Flux<byte[]> to Flux<Document>
 	 */
 	@Bean
@@ -104,8 +102,8 @@ public class ETLFunctions {
 					String name = record.get("name");
 					String description = record.get("description");
 					return new Document(name + " - " + description,
-							Map.of("id", ETLFunctions.getLong(record, "id"), "name", name, "description",
-									description, "listingUrl", record.get("listing_url"), "price", record.get("price"),
+							Map.of("id", ETLFunctions.getLong(record, "id"), "name", name, "description", description,
+									"listingUrl", record.get("listing_url"), "price", record.get("price"),
 									"propertyType", record.get("property_type"), "neighborhood",
 									record.get("neighbourhood"), "bedrooms", record.get("bedrooms"), "bathrooms",
 									record.get("bathrooms"), "beds", record.get("beds")));
@@ -122,7 +120,6 @@ public class ETLFunctions {
 
 	/**
 	 * Transforms a Flux of Document objects into a Flux of Lists of Document objects.
-	 *
 	 * @return a Function that transforms Flux<Document> to Flux<List<Document>>
 	 */
 	@Bean
@@ -134,7 +131,6 @@ public class ETLFunctions {
 
 	/**
 	 * Consumes a Flux of Lists of Document objects and stores them in a VectorStore.
-	 *
 	 * @param vectorStore the VectorStore to store the documents
 	 * @return a Consumer that processes Flux<List<Document>>
 	 */
