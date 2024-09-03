@@ -1,20 +1,17 @@
 package com.ahead.airbnb.controllers;
 
-import com.ahead.airbnb.services.IngestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,32 +35,22 @@ public class AirbnbController {
 
 	private final VectorStore vectorStore;
 
-	private final IngestionService ingestionService;
 
 	private final Resource listingsTemplateResource;
-
-	private PromptTemplate promptTemplate;
-
-	private final ChatModel chatModel;
 
 	private final ChatClient chatClient;
 
 	/**
 	 * Constructor for AirbnbController.
-	 * @param chatModel the chat model to use
 	 * @param builder the chat client builder
 	 * @param vectorStore the vector store for similarity search
-	 * @param ingestionService the service for data ingestion
 	 * @param listingsTemplateResource the resource for the listings template
 	 */
-	public AirbnbController(final ChatModel chatModel, final ChatClient.Builder builder, final VectorStore vectorStore,
-			final IngestionService ingestionService,
+	public AirbnbController(final ChatClient.Builder builder, final VectorStore vectorStore,
 			@Value("classpath:/templates/listing.st") Resource listingsTemplateResource) {
-		this.chatModel = chatModel;
 		this.chatClient = builder.build();
 		this.vectorStore = vectorStore;
 		this.listingsTemplateResource = listingsTemplateResource;
-		this.ingestionService = ingestionService;
 	}
 
 	/**
@@ -73,7 +60,7 @@ public class AirbnbController {
 	public void initPromptTemplate() {
 		try (Reader reader = new InputStreamReader(this.listingsTemplateResource.getInputStream(), UTF_8)) {
 			String template = FileCopyUtils.copyToString(reader);
-			this.promptTemplate = new PromptTemplate(template);
+			PromptTemplate promptTemplate = new PromptTemplate(template);
 		}
 		catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -109,17 +96,6 @@ public class AirbnbController {
 			.content(); // short for getResult().getOutput().getContent();
 	}
 
-	/**
-	 * Ingests data from the Airbnb CSV file into the vector store. This process runs for
-	 * about an hour.
-	 * @return a response entity indicating the ingestion process has started
-	 */
-	@Operation(summary = "Ingest data from the Airbnb CSV file into the vector store. It runs for about an hour.")
-	@GetMapping("/run-ingestion")
-	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<?> ingest() {
-		ingestionService.ingest();
-		return ResponseEntity.accepted().build();
-	}
+
 
 }
