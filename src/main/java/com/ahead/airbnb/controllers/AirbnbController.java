@@ -35,7 +35,6 @@ public class AirbnbController {
 
 	private final VectorStore vectorStore;
 
-
 	private final Resource listingsTemplateResource;
 
 	private final ChatClient chatClient;
@@ -95,7 +94,5 @@ public class AirbnbController {
 			.call()
 			.content(); // short for getResult().getOutput().getContent();
 	}
-
-
 
 }

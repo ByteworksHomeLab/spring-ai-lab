@@ -5,7 +5,7 @@ spring:
     ollama:
       base-url: http://localhost:11434
       chat:
-        model: llama3.1:8b
+        model: llama3
       embedding:
         enabled: true
         model: all-minilm

@@ -13,6 +13,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>spring-ai</name>
 	<description>Basic example of Spring AI</description>
+	<packaging>jar</packaging>
 	<url/>
 	<properties>
 		<java.version>22</java.version>

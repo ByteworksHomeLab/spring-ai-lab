@@ -15,11 +15,11 @@ docker exec -it ollama ollama pull all-minilm
 Next, install the LLama3 LLM
 
 ```shell
-docker exec -it ollama ollama run llama3.1:8b
+docker exec -it ollama ollama run llama3
 ```
 
 The first time you issue the Ollama `run` command it downloads and installs the LLM. Your terminal session may time out during the installation, but the LLM was probably successfully installed.
-Reconnect to the Ollama Docker container to rerun the `ollama run llama3.1:8b` command. The Ollama prompt should return quickly since the llama3 LLM is already installed. Try asking it a question.
+Reconnect to the Ollama Docker container to rerun the `ollama run llama3` command. The Ollama prompt should return quickly since the llama3 LLM is already installed. Try asking it a question.
 
 ```shell
 docker exec -it ollama ollama run llama3
@@ -84,7 +84,7 @@ spring:
       base-url: http://${OLLAMA_HOST}:11434
       chat:
         options:
-          model: llama3.1:8b
+          model: llama3
       embedding:
         enabled: true
         model: all-minilm
